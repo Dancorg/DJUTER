@@ -133,12 +133,12 @@ function startLevel(){
 	background.cache(0,0,640,480);
 	stage.addChild(background);
 	
-	player1 = new Player("Player 1", 320, 100,"40,180,250", stage);
+	player1 = new Player("Player 1", 320, 60,"40,180,250", stage);
 	player1.vspeed = 0;
-	player2 = new Player("Player 2", 320, 100,"250,180,40", stage);
+	player2 = new Player("Player 2", 320, 60,"250,180,40", stage);
 	player2.vspeed = 0;
 	players = [player1, player2];
-	
+	platformFirstSpawn();
 	gui = new Container();
 	scoreText1 = new Text("SCORE: ", "17px impact", "#AFF");
 	scoreText1.x = 10;
@@ -150,7 +150,7 @@ function startLevel(){
 	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,150,30,0,0,30,0).drawRoundRectComplex(640-150,0,150,30,0,0,0,30)//.rect(0,0,150,30);
 	gui.addChild(scoreBack, scoreText1,scoreText2);		
 	stage.addChild(gui);
-	Box(300,120,60,15,stage,"up");
+	Box(300,80,60,15,stage,"up");
 }
 
 function tick(){
@@ -203,7 +203,13 @@ function tick(){
 			coinExplosion(c.x,c.y);
 			coins.splice(i,1);
 			stage.removeChild(c);
-		}		
+		}
+		if(player2.x < c.x+c.s && player2.x+player2.s > c.x && player2.y<c.y+c.s && player2.y+player2.s>c.y  ){
+			score2 += 5;
+			coinExplosion(c.x,c.y);
+			coins.splice(i,1);
+			stage.removeChild(c);
+		}
 	}
 	for(i in players){
 		var p = players[i];
@@ -220,6 +226,17 @@ function tick(){
 	
 }
 
+function platformFirstSpawn(){
+	var x,y,w,h;
+	for(var i=0; i<40; i++){
+		h = Math.round(Math.random()*40+8);
+		w = Math.round(Math.random()*80+20);
+		x = Math.round(Math.random()*640-w);
+		y = Math.round(Math.random()*(400-h)+80);
+		Box(x,y,w,h, stage, 0);
+	}
+}
+
 function platformSpawner(){
 	var x,y,w,h;
 	if(Math.round(Math.random()*5)==0){
@@ -229,26 +246,24 @@ function platformSpawner(){
 	y = -h;
 	w = Math.round(Math.random()*(40*(8*diff/(1+diff)))+20-(16*(diff/(1+diff))));
 	x = Math.round(320+Math.sin(maincounter*diff)*320) - w/2;
-	Box(x,y,w,h, stage);
-
-	Math.random();
+	Box(x,y,w,h, stage, 1+Math.round(Math.random()*diff));
 }
 
-function preciseColllision(player1, b){
+function preciseColllision(player, b){
 	var choque="none"; //by default
-	var div = Math.max(Math.abs(player1.hspeed), Math.abs(player1.vspeed));
+	var div = Math.max(Math.abs(player.hspeed), Math.abs(player.vspeed));
 	if(div == 0)div = 1;
 	for(var i=0; i<div; i++){
-		px = player1.x + i*player1.hspeed/div;
-		py = player1.y + i*player1.vspeed/div;
-		if(player1.x+i*player1.hspeed/div < b.x+b.w && player1.x+player1.s+i*player1.hspeed/div > b.x && player1.y+i*player1.vspeed/div<b.y+b.h && player1.y+player1.s+i*player1.vspeed/div>b.y ){
+		px = player.x + i*player.hspeed/div;
+		py = player.y + i*player.vspeed/div;
+		if(player.x+i*player.hspeed/div < b.x+b.w && player.x+player.s+i*player.hspeed/div > b.x && player.y+i*player.vspeed/div<b.y+b.h && player.y+player.s+i*player.vspeed/div>b.y ){
 			if(py<b.y)
 				choque = "floor";
-			else if(px+player1.s*0.5<b.x) 
+			else if(px+player.s*0.5<b.x) 
 				choque = "lwall";
-			else if(px+player1.s*0.5>b.x+b.w)
+			else if(px+player.s*0.5>b.x+b.w)
 				choque = "rwall";
-			else if(py+player1.s>b.y+b.h && b.speed-player1.vspeed>0)
+			else if(py+player.s>b.y+b.h && b.speed-player.vspeed>0)
 				choque = "ceiling";
 			break;
 		}
@@ -256,24 +271,24 @@ function preciseColllision(player1, b){
 	
 	switch(choque){
 		case "floor":
-			player1.canjump = true;
-			player1.onfloor = true;
-			player1.vspeed = b.speed;
-			player1.y = b.y-player1.s;
+			player.canjump = true;
+			player.onfloor = true;
+			player.vspeed = b.speed;
+			player.y = b.y-player.s;
 			break;
 		case "ceiling":
-			player1.vspeed = b.speed;//*1.1
-			player1.jumping = 0;
-			if(player1.onfloor)death();
+			player.vspeed = b.speed;//*1.1
+			player.jumping = 0;
+			if(player.onfloor)player.death();
 			break;
 		case "lwall":
-			if(player1.hspeed>0)
-				player1.hspeed = 0;
+			if(player.hspeed>0)
+				player.hspeed = 0;
 			//player.canjump = false;
 			break;
 		case "rwall":
-			if(player1.hspeed<0)
-				player1.hspeed = 0;
+			if(player.hspeed<0)
+				player.hspeed = 0;
 			//player.canjump = false;
 			break;
 	}

@@ -2,7 +2,7 @@ function Enemy(x, y, stage){
 	shape = new Shape();
 	var s = 10;
 	shape.isAlive=true;
-	shape.graphics.beginFill('rgba(40,180,250,1)').rect(0,0,s,s).beginFill('rgba(40,180,250,0.1)').rect(-3,-3,s+6,s+6);
+	shape.graphics.beginFill('rgba(220,50,80,1)').rect(0,0,s,s).beginFill('rgba(220,50,80,0.1)').rect(-3,-3,s+6,s+6);
 	shape.s = s;
 	shape.x = x;
 	shape.y = y;
