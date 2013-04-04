@@ -22,9 +22,19 @@ function handleKeyDown(e){
 		case keya:
 			player1.left = true;return false;
 		case keyright:
-			player2.right = true;break;
+			player2.right = true;return false;
 		case keyd:
-			player1.right = true;break;
+			player1.right = true;return false;
+		case keydown:
+			player2.drop = true;
+			player2.candrop = false;return false;
+		case keys:
+			player1.drop = true;
+			player1.candrop = false;return false;
+		case keyspace:
+			player1.attack = true;return false;
+		case keyintro:
+			player2.attack = true;return false;
 	}
 	
 }
@@ -42,9 +52,19 @@ function handleKeyUp(e){
 		case keya:
 			player1.left = false;return false;
 		case keyright:
-			player2.right = false;break;
+			player2.right = false;return false;
 		case keyd:
-			player1.right = false;break;
+			player1.right = false;return false;
+		case keydown:
+			player2.drop = false;
+			player2.candrop=0;return false;
+		case keys:
+			player1.drop = false;
+			player1.candrop=0;return false;
+		case keyspace:
+			player1.attack = false;return false;
+		case keyintro:
+			player2.attack = false;return false;
 	}
 }
 

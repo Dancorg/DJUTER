@@ -11,8 +11,13 @@ function Player(name, x, y, color, stage){
 	shape.left = 0;
 	shape.right = 0;
 	shape.jump = 0;
+	shape.drop = 0;
+	shape.energy = 0;
+	shape.maxenergy = 10;
 	shape.canjump = false;
+	shape.candrop = false;
 	shape.jumping=0;
+	shape.droping=0;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.onfloor = false;
@@ -21,23 +26,34 @@ function Player(name, x, y, color, stage){
 	shape.update = function(){
 		if(this.isAlive){
 
-			if(maincounter%5==0 && !this.jumping){
+			if(maincounter%3==0 && (this.energy>0 &&(this.jump || this.drop))){
 				Particle(this.x+5,this.y+5,5,0,0,this.color,stage, false);}
 			
 			if(this.vspeed<10 && !this.onfloor)
 				this.vspeed += 0.5;
 			
+			if(this.onfloor && this.energy<this.maxenergy)
+				this.energy+=this.maxenergy/5;
+			
 			this.onfloor = false; //by default supposed to be on air
-			this.canjump = false; //by default supposed to be on 
+			this.canjump = false; //by default supposed to be on air
+			this.candrop = true; //by default supposed to be on air
+
 			
 			for(i in boxes ){
 				b = boxes[i];	
 				preciseColllision(this, b);
 			}
+			for(i in players ){
+				b = players[i];
+				//if(b != this)
+				playerColllision(this, b);
+			}
 
 			
-			if(this.canjump)this.jumping=9;
-			if(this.x+this.s<0 || this.x-this.s>640 || this.y+this.s<0 || this.y-this.s>480)
+			if(this.canjump)this.jumping=8;
+			if(this.candrop)this.droping=8;
+			if(this.x+this.s<0 || this.x-this.s>gamewidth || this.y+this.s<0 || this.y-this.s>gameheight)
 				this.death();
 			this.y += this.vspeed;
 			this.x += this.hspeed;
@@ -45,11 +61,27 @@ function Player(name, x, y, color, stage){
 			if(this.right  && this.hspeed<4)this.hspeed += 0.5;
 			if(!(this.left || this.right)) this.hspeed/=2;
 			if(this.jump){
-				if(this.jumping > 0){
-					this.vspeed -= 1.5
+				if(this.energy > 0){
+					this.vspeed -= 1.5;
+					this.energy--;
+				}
+				/*if(this.jumping > 0){
+					this.vspeed -= 1.5;
 					this.jumping--;
-				}		
+				}*/		
 			}
+			if(this.drop){
+				if(this.energy > 0){
+					this.vspeed += 1.5;
+					this.energy--;
+				}
+			}
+			/*if(this.drop && this.candrop){
+				this.vspeed += 3;
+				this.drop = false;
+				this.candrop = false;
+					
+			}*/
 		}
 	};
 	shape.death = function (){//player dies, score screen displayed
@@ -61,13 +93,13 @@ function Player(name, x, y, color, stage){
 		}
 		
 		var deathBox = new Shape();
-		deathBox.graphics.beginFill('rgba(200,50,50,0.1)').rect(0,-20,640,90).beginFill('rgba(10,10,10,0.8)').rect(0,-3,640,56).beginFill('rgba(200,50,50,0.7)').rect(0,0,640,50);
+		deathBox.graphics.beginFill('rgba(200,50,50,0.1)').rect(0,-20,gamewidth,90).beginFill('rgba(10,10,10,0.8)').rect(0,-3,gamewidth,56).beginFill('rgba(200,50,50,0.7)').rect(0,0,gamewidth,50);
 		deathBox.x=0;
 		deathBox.y=150;
 		gui.addChild(deathBox);
 		var deathText = new Text(this.name + " has daid: ", "30px Impact", "#FFF");
 		deathText.textAlign = "center";
-		deathText.x = 320;
+		deathText.x = gamewidth/2;
 		deathText.y = 156;
 		gui.addChild(deathText);
 		stage.update();
