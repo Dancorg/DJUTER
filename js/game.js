@@ -25,7 +25,6 @@ var jump = 0;
 var gui;
 var startButton = false;
 var endButton = true;
-var boxSpawn;
 var diff;
 var score1;
 var score2;
@@ -58,9 +57,6 @@ function reset(){
 	endtimer = -1;
 	maincounter=0;
 }
-
-
-
 
 function resizeCanvas(){
 	var cwidth = $('#screen').width();
@@ -118,7 +114,7 @@ function startMenu(){
 	startBox.x=0;
 	startBox.y=150;
 	stage.addChild(startBox);
-	var startText = new Text("DJUTER", "45px impact", "#EEF");
+	var startText = new Text("Z-DJUTER", "45px impact", "#EEF");
 	startText.textAlign = "center";
 	startText.x = gamewidth/2;
 	startText.y = 155;
@@ -128,8 +124,7 @@ function startMenu(){
 	startText2.x = gamewidth/2;
 	startText2.y = 400;
 	stage.addChild(startText2);
-	stage.update();
-	
+	stage.update();	
 }
 
 function startLevel(){
@@ -139,12 +134,20 @@ function startLevel(){
 	background.graphics.beginRadialGradientFill(["#112","#27B"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
-	
-	player1 = new Player("Player 1", gamewidth/2, 60,"40,180,250", stage);
-	player1.vspeed = 0;
-	player2 = new Player("Player 2", gamewidth/2, 60,"250,180,40", stage);
+	ene = Enemy(50,50,stage, 2);
+	ene1 = Enemy(30,50,stage, 2);
+	ene2 = Enemy(50,30,stage, 2);
+	ene3 = Enemy(80,50,stage, 2);
+	ene4 = Enemy(50,80,stage, 2);
+	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
+	player1.vspeed = 0;*/
+	player2 = new Player("Player 2", gamewidth/2+100, 60+200,"250,180,40", stage);
 	player2.vspeed = 0;
-	players = [player1, player2];
+	player1 = ene;
+	ene.assumeControl();
+	players = [ player2,ene,ene1,ene2,ene3,ene4];
+	
+	
 	platformFirstSpawn();
 	gui = new Container();
 	scoreText1 = new Text("SCORE: ", "17px impact", "#AFF");
@@ -163,7 +166,7 @@ function startLevel(){
 	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,150,50,0,0,30,0).drawRoundRectComplex(gamewidth-150,0,150,50,0,0,0,30)//.rect(0,0,150,30);
 	gui.addChild(scoreBack, scoreText1, scoreText2, energyText1, energyText2);		
 	stage.addChild(gui);
-	Box(gamewidth/2-20,80,60,15,stage,"up");
+	//Box(gamewidth/2-20,80,60,15,stage,"up");
 }
 
 function tick(){
@@ -195,7 +198,6 @@ function tick(){
 		part.x += part.hspeed;
 		part.y += part.vspeed;
 		part.hspeed *= 0.9;
-		part.vspeed += 0.1;
 		part.vspeed *= 0.9;
 		part.alpha -= 1/120;
 		part.timer--;
@@ -232,85 +234,82 @@ function tick(){
 		var p = players[i];
 		p.update();
 	}
-	if(boxSpawn <= 0){
-		platformSpawner();
-		boxSpawn = 20-10*(Math.sin(diff));
-	}
-	else
-		boxSpawn--;
 	
 	stage.update();
-	
 }
+
 
 function platformFirstSpawn(){
 	var x,y,w,h;
 	for(var i=0; i<20; i++){
-		h = Math.round(Math.random()*40+8);
-		w = Math.round(Math.random()*80+20);
+		h = Math.round(Math.random()*80+8);
+		w = Math.round(Math.random()*80+8);
 		x = Math.round(Math.random()*gamewidth-w);
 		y = Math.round(Math.random()*(gameheight-80-h)+80);
 		Box(x,y,w,h, stage, 0);
 	}
 }
 
-function platformSpawner(){
-	var x,y,w,h;
-	if(Math.round(Math.random()*5)==0){
-		Coin(Math.round(Math.random()*gamewidth),-10,stage);
+function boxCollision(a,b){
+	var choque="none";
+	var div = Math.max(Math.abs(a.hspeed), Math.abs(a.vspeed));
+	if(div == 0)div = 1;
+	for(var i=0; i<div; i++){
+		px = a.x + i*a.hspeed/div;
+		py = a.y + i*a.vspeed/div;
+		if(a.x+i*a.hspeed/div < b.x+b.w && a.x+a.w+i*a.hspeed/div > b.x && a.y+i*a.vspeed/div<b.y+b.h && a.y+a.h+i*a.vspeed/div>b.y ){
+			return true;
+		}
 	}
-	h = Math.round(Math.random()*30+8);
-	y = -h;
-	w = Math.round(Math.random()*(40*(8*diff/(1+diff)))+20-(16*(diff/(1+diff))));
-	x = Math.round(gamewidth/2+Math.sin(maincounter*diff)*(gamewidth/2)) - w/2;
-	Box(x,y,w,h, stage, 1+Math.round(Math.random()*diff));
+	return false;
+}
+
+
+function playerColllision(playera, b){
+	if(boxCollision(playera, b)){
+		b.vspeed += playera.vspeed;
+		playera.y -= playera.vspeed;
+		playera.vspeed += -playera.vspeed;
+
+		b.hspeed += playera.hspeed;
+		playera.x -= playera.hspeed;
+		playera.hspeed += -playera.hspeed;
+	}
 }
 
 function preciseColllision(player, b){
-	var choque="none"; //by default
-	var div = Math.max(Math.abs(player.hspeed), Math.abs(player.vspeed));
-	if(div == 0)div = 1;
-	for(var i=0; i<div; i++){
-		px = player.x + i*player.hspeed/div;
-		py = player.y + i*player.vspeed/div;
-		if(player.x+i*player.hspeed/div < b.x+b.w && player.x+player.s+i*player.hspeed/div > b.x && player.y+i*player.vspeed/div<b.y+b.h && player.y+player.s+i*player.vspeed/div>b.y ){
-			if(py<b.y)
-				choque = "floor";
-			else if(px+player.s*0.5<b.x) 
-				choque = "lwall";
-			else if(px+player.s*0.5>b.x+b.w)
-				choque = "rwall";
-			else if(py+player.s>b.y+b.h && b.speed-player.vspeed>0)
-				choque = "ceiling";
-			break;
-		}
+	var choque;
+	if(boxCollision(player, b)){
+		if(py<b.y)
+			choque = "floor";
+		else if(px+player.s*0.5<b.x) 
+			choque = "lwall";
+		else if(px+player.s*0.5>b.x+b.w)
+			choque = "rwall";
+		else if(py+player.s>b.y+b.h && b.speed-player.vspeed>0)
+			choque = "ceiling";
 	}
 	
 	switch(choque){
 		case "floor":
-			player.canjump = true;
-			player.onfloor = true;
-			player.candrop = true;
-			player.vspeed = b.speed;
-			player.y = b.y-player.s;
+			if(player.vspeed>0)
+				player.vspeed = 0;
 			break;
 		case "ceiling":
-			player.vspeed = b.speed;//*1.1
-			player.jumping = 0;
-			if(player.onfloor)player.death();
+			if(player.vspeed<0)
+				player.vspeed = 0;
 			break;
 		case "lwall":
 			if(player.hspeed>0)
 				player.hspeed = 0;
-			//player.canjump = false;
 			break;
 		case "rwall":
 			if(player.hspeed<0)
 				player.hspeed = 0;
-			//player.canjump = false;
 			break;
 	}
 }
+
 
 function death(){//player dies, score screen displayed
 	player1.isAlive = false;
@@ -325,11 +324,6 @@ function death(){//player dies, score screen displayed
 	deathBox.x = 0;
 	deathBox.y = 150;
 	gui.addChild(deathBox);
-	/*var deathText = new Text("YOR DED!.... SCORE: " + score, "30px Impact", "#FFF");
-	deathText.textAlign = "center";
-	deathText.x = 320;
-	deathText.y = 156;
-	gui.addChild(deathText);*/
 	stage.update();
 	endButton = false;
 }
@@ -348,9 +342,6 @@ function boxExplosion(a,b){ //platform explosion
 		Particle(b.x+i*10,b.y+Math.random()*b.h,5,Math.random()*20-10,Math.random()*30-15,b.color,stage, true);
 	}
 }
-
-
-
 
 /*Array.prototype.remove = function(from, to) {
    var rest = this.slice((to || from) + 1 || this.length);

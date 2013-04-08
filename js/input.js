@@ -12,11 +12,9 @@ function handleKeyDown(e){
 	}
 	switch(e.keyCode){
 		case keyup:
-			player2.jump = true;
-			player2.canjump = false;return false;
+			player2.up = true;return false;
 		case keyw:
-			player1.jump = true;
-			player1.canjump = false;return false;
+			player1.up = true;return false;
 		case keyleft:
 			player2.left = true;return false;
 		case keya:
@@ -26,11 +24,9 @@ function handleKeyDown(e){
 		case keyd:
 			player1.right = true;return false;
 		case keydown:
-			player2.drop = true;
-			player2.candrop = false;return false;
+			player2.down = true;return false;
 		case keys:
-			player1.drop = true;
-			player1.candrop = false;return false;
+			player1.down = true;return false;
 		case keyspace:
 			player1.attack = true;return false;
 		case keyintro:
@@ -42,11 +38,9 @@ function handleKeyDown(e){
 function handleKeyUp(e){
 	switch(e.keyCode){
 		case keyup:
-			player2.jump = false;
-			player2.jumping=0;return false;
+			player2.up = false;return false;
 		case keyw:
-			player1.jump = false;
-			player1.jumping=0;return false;
+			player1.up = false;return false;
 		case keyleft:
 			player2.left = false;return false;
 		case keya:
@@ -56,11 +50,9 @@ function handleKeyUp(e){
 		case keyd:
 			player1.right = false;return false;
 		case keydown:
-			player2.drop = false;
-			player2.candrop=0;return false;
+			player2.down = false;return false;
 		case keys:
-			player1.drop = false;
-			player1.candrop=0;return false;
+			player1.down = false;return false;
 		case keyspace:
 			player1.attack = false;return false;
 		case keyintro:
