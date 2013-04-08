@@ -66,8 +66,8 @@ var aiZUpdate = function(){
 
 function assumeControl(){
 	this.ai = function(){return true;};
-	//setPlayer(this, this.side);
-	
+	if(this.side == 1)player1 = this;
+	if(this.side == 2)player2 = this;
 }
 
 function abandonControl(){

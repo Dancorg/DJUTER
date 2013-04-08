@@ -74,14 +74,14 @@ var playerUpdate = function(){
 			this.death();
 		this.y += this.vspeed;
 		this.x += this.hspeed;
-		var diagonal = ((this.left || this.right)&&(this.down || this.up))?0.71:1;
+		var diagonal = (((this.left || this.right)&&(this.down || this.up)))?0.71:1;
 		
 		if(this.left && this.hspeed>-4*diagonal)this.hspeed -= 0.5*diagonal;
 		if(this.right  && this.hspeed<4*diagonal)this.hspeed += 0.5*diagonal;
 		if(this.up && this.vspeed>-4*diagonal)this.vspeed -= 0.5*diagonal;
 		if(this.down  && this.vspeed<4*diagonal)this.vspeed += 0.5*diagonal;
-		if(!(this.left || this.right) || Math.abs(this.hspeed)>4) this.hspeed/=2;
-		if(!(this.up || this.down)|| Math.abs(this.vspeed)>4) this.vspeed/=2;
+		if(!(this.left || this.right) || Math.abs(this.hspeed)>4*diagonal) this.hspeed/=2;
+		if(!(this.up || this.down)|| Math.abs(this.vspeed)>4*diagonal) this.vspeed/=2;
 	}
 }
 

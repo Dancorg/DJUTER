@@ -134,16 +134,16 @@ function startLevel(){
 	background.graphics.beginRadialGradientFill(["#112","#27B"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
-	ene = Enemy(50,50,stage, 2);
-	ene1 = Enemy(30,50,stage, 2);
-	ene2 = Enemy(50,30,stage, 2);
-	ene3 = Enemy(80,50,stage, 2);
-	ene4 = Enemy(50,80,stage, 2);
+	ene = Enemy(50,50,stage, 1);
+	ene1 = Enemy(30,50,stage, 1);
+	ene2 = Enemy(50,30,stage, 1);
+	ene3 = Enemy(80,50,stage, 1);
+	ene4 = Enemy(50,80,stage, 1);
 	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
 	player1.vspeed = 0;*/
 	player2 = new Player("Player 2", gamewidth/2+100, 60+200,"250,180,40", stage);
 	player2.vspeed = 0;
-	player1 = ene;
+	//player1 = ene;
 	ene.assumeControl();
 	players = [ player2,ene,ene1,ene2,ene3,ene4];
 	
@@ -250,9 +250,9 @@ function platformFirstSpawn(){
 	}
 }
 
-function boxCollision(a,b){
+function boxCollision(a,b,h,v){
 	var choque="none";
-	var div = Math.max(Math.abs(a.hspeed), Math.abs(a.vspeed));
+	var div = Math.max(Math.abs(a.hspeed*h), Math.abs(a.vspeed*v));
 	if(div == 0)div = 1;
 	for(var i=0; i<div; i++){
 		px = a.x + i*a.hspeed/div;
@@ -266,20 +266,25 @@ function boxCollision(a,b){
 
 
 function playerColllision(playera, b){
-	if(boxCollision(playera, b)){
-		b.vspeed += playera.vspeed;
-		playera.y -= playera.vspeed;
-		playera.vspeed += -playera.vspeed;
-
-		b.hspeed += playera.hspeed;
-		playera.x -= playera.hspeed;
-		playera.hspeed += -playera.hspeed;
+	if(boxCollision(playera, b,1,1)){
+		if(boxCollision(playera, b,0,1)){
+			//b.vspeed += playera.vspeed;
+			//playera.y -= playera.vspeed;
+			//playera.vspeed += -playera.vspeed;
+			playera.y += playera.y<b.y?-b.h:b.h;
+		}
+		if(boxCollision(playera, b,1,0)){
+			//b.hspeed += playera.hspeed;
+			//playera.x -= playera.hspeed;
+			//playera.hspeed += -playera.hspeed;
+			playera.x += playera.x<b.x?-b.w:b.w;
+		}
 	}
 }
 
 function preciseColllision(player, b){
 	var choque;
-	if(boxCollision(player, b)){
+	if(boxCollision(player, b,1,1)){
 		if(py<b.y)
 			choque = "floor";
 		else if(px+player.s*0.5<b.x) 
