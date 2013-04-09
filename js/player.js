@@ -1,8 +1,9 @@
-function Player(name, x, y, color, stage){
+function Player(name, side, x, y, color, stage){
 	shape = new Shape();
 	var s = 10;
 	shape.controllable = true;
 	shape.name = name;
+	shape.side = side;
 	shape.isAlive = true;
 	shape.color = 'rgba('+color+',1)';
 	shape.graphics.beginFill(shape.color).rect(0,0,s,s).beginFill('rgba('+color+',0.1)').rect(-3,-3,s+6,s+6);
@@ -89,7 +90,7 @@ var playerUpdate = function(){
 		if(this.attack){
 			var hspeed = Math.cos(this.angle)*20;
 			var vspeed = Math.sin(this.angle)*20;
-			Projectile(this.x+this.s/2,this.y+this.s/2,5,hspeed,vspeed,radToDeg(this.angle),50,1,"rgba(250,250,0,1)",5,20,stage);
+			Projectile(this,this.x+this.s/2,this.y+this.s/2,5,hspeed,vspeed,radToDeg(this.angle),50,1,"rgba(250,250,0,1)",5,20,stage);
 		}
 	}
 }

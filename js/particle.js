@@ -19,7 +19,7 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
 		shape.glow.y = y;
 		stage.addChild(shape.glow);
 	}
-	shape.update = function(){	
+	shape.update = function(i){	
 		this.x += this.hspeed;
 		this.y += this.vspeed;
 		this.hspeed *= 0.9;
@@ -40,6 +40,11 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
 	particles.push(shape);
 }
 
+function BulletDeath(i){
+	//particles.splice(i,1);
+	particles[i] = null;
+	stage.removeChild(this);
+}
 
 function Coin(x,y,stage){
 	shape = new Shape();
@@ -53,7 +58,7 @@ function Coin(x,y,stage){
 	coins.push(shape);
 }
 
-function Projectile(x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,size2,stage){
+function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,size2,stage){
 	shape = new Shape();
 	shape.graphics.setStrokeStyle(size1,"butt").beginStroke(color).moveTo(0,0).lineTo(size2,0);
 	shape.x = x;
@@ -64,11 +69,26 @@ function Projectile(x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,size2,s
 	shape.damage = damage;
 	shape.hspeed = hspeed;
 	shape.vspeed = vspeed;
+	shape.owner = owner;
+	shape.side = owner.side;
 	stage.addChild(shape);
-	shape.update = function(){
+	shape.death = BulletDeath;
+	shape.update = function(i){
 		this.time--;
 		this.x += this.hspeed;
 		this.y += this.vspeed;
+		for(i in boxes){
+			var box = boxes[i];
+			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box)){
+				this.death(i);
+			}
+		}
+		for(i in players){
+			var p = players[i];
+			if(p.side != this.side && collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,p)){
+				this.death(i);
+			}
+		}
 	};
 	particles.push(shape);
 }

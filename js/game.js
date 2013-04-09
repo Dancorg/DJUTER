@@ -142,7 +142,7 @@ function startLevel(){
 	ene4 = Enemy(50,80,stage, 1);
 	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
 	player1.vspeed = 0;*/
-	player2 = new Player("Player 2", gamewidth/2+100, 60+200,"250,180,40", stage);
+	player2 = new Player("Player 2",2, gamewidth/2+100, 60+200,"250,180,40", stage);
 	player2.vspeed = 0;
 	//player1 = ene;
 	ene.assumeControl();
@@ -204,8 +204,7 @@ function tick(){
 	
 	for(i in particles){
 		var part = particles[i];
-		part.update();
-
+		if(part)part.update(i);
 	}
 	for(i in coins){
 		var c = coins[i];

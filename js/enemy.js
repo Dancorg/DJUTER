@@ -123,3 +123,47 @@ function collisionLine(s,t,p){ // s,t = start and end objects, p = walls
 	}
     return r;
 }
+
+function collisionLinePoints(s1,s2,t1,t2,i){ // s,t = start and end objects, p = walls
+    var r = true;
+	var a1 = [s1, s2];
+	var a2 = [t1, t2];
+    var dis1 = pointDistanceSquared(a1[0],a1[1],a2[0],a2[1]);
+
+    function scanB(dat1,dat2,dat3,dat4){
+        var den = ((dat4[1]-dat3[1])*(dat2[0]-dat1[0]))-((dat4[0]-dat3[0])*(dat2[1]-dat1[1]));
+        if (den == 0)
+            return false;
+        else{
+            var ua = (((dat4[0]-dat3[0]) * (dat1[1]-dat3[1])) - ((dat4[1]-dat3[1]) * (dat1[0]-dat3[0])))/den;
+            var ub = (((dat2[0]-dat1[0]) * (dat1[1]-dat3[1])) - ((dat2[1]-dat1[1]) * (dat1[0]-dat3[0])))/den;
+
+            if ((ua<0)||(ua>1)||(ub<0)||(ub>1))
+                return false;
+            else
+                return true;
+		}
+	}
+	
+	var dis2 = pointDistanceSquared(a1[0],a1[1],i.x+i.w/2,i.y+i.h/2);
+	var iix = i.x+i.w/2;
+	var iiy = i.y+i.h/2;
+	var ww = i.w/2;
+	var hh = i.h/2;
+
+	var b1 = [iix - ww, iiy - hh];
+	var b2 = [iix + ww, iiy + hh];
+
+	var c1 = [iix - ww, iiy + hh];
+	var c2 = [iix + ww, iiy - hh];
+
+	if (!scanB(a1,a2,b1,b2) && !scanB(a1,a2,c1,c2))
+		r = false;
+	else{
+		return true;
+	}
+
+	r = false;
+	
+    return r;
+}
