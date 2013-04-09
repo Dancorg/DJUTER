@@ -107,34 +107,31 @@ function handleTouchEnd(e){
 
 //COPY OF KEYBOARD EVENTS, UPDATE IF KEYBOARD EVENTS CHANGE
 function handleMouseDown(e){
-	var canvasx = canvas.offsetLeft;
-	var canvasY = canvas.offsetTop;
-	if(!startButton){
-		startButton = true;
-		startLevel();
-	}
-	if(!endButton && endtimer == 0){                                                                                                                                                                                                                                                                                                                
-		endButton = true;
-		startLevel();
-		/*startButton = false;
-		startMenu();*/
-	}
-	if(e.clientX  <200+canvasx)left = true;
+	var mX = e.clientX - canvas.offsetLeft;
+	var mY = e.clientY - canvas.offsetTop;
+	player2.attack = true;
+	player2.angle = Math.atan2(mY-player2.y,mX-player2.x);
+	/*if(e.clientX  <200+canvasx)left = true;
 	if((e.clientX  >=200+canvasx && e.clientX  <=440+canvasx) || e.clientY<300+canvasY){
 		jump = true;
 		player1.canjump = false;
 	}
-	if(e.clientX  >440+canvasx)right = true;
+	if(e.clientX  >440+canvasx)right = true;*/
+}
+
+function handleMouseMove(e){
+	var mX = e.clientX - canvas.offsetLeft;
+	var mY = e.clientY - canvas.offsetTop;
+	player2.angle = Math.atan2(mY-player2.y,mX-player2.x);
 }
 
 function handleMouseUp(e){
-	var canvasx = canvas.offsetLeft;
-	var canvasY = canvas.offsetTop;
-	if(e.clientX  <200+canvasx)left = false;
+	player2.attack = false;
+	/*if(e.clientX  <200+canvasx)left = false;
 	if((e.clientX  >=200+canvasx && e.clientX  <=440+canvasx) || e.clientY<300+canvasY){
 		jump = false;
 		player1.jumping=0;
 	}
-	if(e.clientX  >440+canvasx)right = false;
+	if(e.clientX  >440+canvasx)right = false;*/
 
 }

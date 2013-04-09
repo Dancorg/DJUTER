@@ -18,6 +18,8 @@ function Player(name, x, y, color, stage){
 	shape.down = 0;
 	shape.energy = 0;
 	shape.maxenergy = 10;
+	shape.attack = false;
+	shape.angle = 0;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.vspeed = 0;
@@ -66,10 +68,7 @@ var playerUpdate = function(){
 			b = boxes[i];	
 			preciseColllision(this, b);
 		}
-		for(i in players ){
-			b = players[i];
-			if(b != this)playerColllision(this, b);
-		}
+		
 		if(this.x+this.s<0 || this.x-this.s>gamewidth || this.y+this.s<0 || this.y-this.s>gameheight)
 			this.death();
 		this.y += this.vspeed;
@@ -82,6 +81,16 @@ var playerUpdate = function(){
 		if(this.down  && this.vspeed<4*diagonal)this.vspeed += 0.5*diagonal;
 		if(!(this.left || this.right) || Math.abs(this.hspeed)>4*diagonal) this.hspeed/=2;
 		if(!(this.up || this.down)|| Math.abs(this.vspeed)>4*diagonal) this.vspeed/=2;
+
+		for(i in players ){
+			b = players[i];
+			if(b != this)playerColllision(this, b);
+		}
+		if(this.attack){
+			var hspeed = Math.cos(this.angle)*20;
+			var vspeed = Math.sin(this.angle)*20;
+			Projectile(this.x+this.s/2,this.y+this.s/2,5,hspeed,vspeed,radToDeg(this.angle),50,1,"rgba(250,250,0,1)",5,20,stage);
+		}
 	}
 }
 

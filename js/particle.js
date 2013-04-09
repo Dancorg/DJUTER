@@ -19,6 +19,23 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
 		shape.glow.y = y;
 		stage.addChild(shape.glow);
 	}
+	shape.update = function(){	
+		this.x += this.hspeed;
+		this.y += this.vspeed;
+		this.hspeed *= 0.9;
+		this.vspeed *= 0.9;
+		this.alpha -= 1/120;
+		this.timer--;
+		this.glow.x = this.x;
+		this.glow.y = this.y;
+		this.glow.alpha -= 1/480;
+		this.glow.alpha+=Math.random()*0.1-0.05;
+		if(this.timer <=0 ){
+			particles.splice(i,1);
+			stage.removeChild(this.glow);
+			stage.removeChild(this);
+		}
+	}
 	stage.addChild(shape);
 	particles.push(shape);
 }
@@ -34,4 +51,24 @@ function Coin(x,y,stage){
 	shape.cache(-3,-3,shape.s+6,shape.s+6);
 	stage.addChild(shape);
 	coins.push(shape);
+}
+
+function Projectile(x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,size2,stage){
+	shape = new Shape();
+	shape.graphics.setStrokeStyle(size1,"butt").beginStroke(color).moveTo(0,0).lineTo(size2,0);
+	shape.x = x;
+	shape.y = y;
+	shape.rotation = angle;
+	shape.drop = drop;
+	shape.time = time;
+	shape.damage = damage;
+	shape.hspeed = hspeed;
+	shape.vspeed = vspeed;
+	stage.addChild(shape);
+	shape.update = function(){
+		this.time--;
+		this.x += this.hspeed;
+		this.y += this.vspeed;
+	};
+	particles.push(shape);
 }

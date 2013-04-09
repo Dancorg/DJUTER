@@ -38,9 +38,10 @@ var gameheight = 600;
 
 /*document.ontouchstart = handleTouchStart;
 document.ontouchend = handleTouchEnd;
-document.ontouchleave = handleTouchEnd;
+document.ontouchleave = handleTouchEnd;*/
 document.onmousedown = handleMouseDown;
-document.onmouseup = handleMouseUp;*/
+document.onmousemove = handleMouseMove;
+document.onmouseup = handleMouseUp;
 document.onkeydown = handleKeyDown;
 document.onkeyup = handleKeyUp;
 
@@ -167,6 +168,14 @@ function startLevel(){
 	gui.addChild(scoreBack, scoreText1, scoreText2, energyText1, energyText2);		
 	stage.addChild(gui);
 	//Box(gamewidth/2-20,80,60,15,stage,"up");
+	
+	
+	line = new Shape();
+	line.graphics.setStrokeStyle(4,"butt").beginStroke('rgba(220,50,80,1)').moveTo(0,0).lineTo(20,0);
+	line.x = 250;
+	line.y = 50;
+	line.rotation = 45;
+	stage.addChild(line);
 }
 
 function tick(){
@@ -195,21 +204,7 @@ function tick(){
 	
 	for(i in particles){
 		var part = particles[i];
-		part.x += part.hspeed;
-		part.y += part.vspeed;
-		part.hspeed *= 0.9;
-		part.vspeed *= 0.9;
-		part.alpha -= 1/120;
-		part.timer--;
-		part.glow.x = part.x;
-		part.glow.y = part.y;
-		part.glow.alpha -= 1/480;
-		part.glow.alpha+=Math.random()*0.1-0.05;
-		if(part.timer <=0 ){
-			particles.splice(i,1);
-			stage.removeChild(part.glow);
-			stage.removeChild(part);
-		}
+		part.update();
 
 	}
 	for(i in coins){
@@ -251,35 +246,65 @@ function platformFirstSpawn(){
 }
 
 function boxCollision(a,b,h,v){
-	var choque="none";
-	var div = Math.max(Math.abs(a.hspeed*h), Math.abs(a.vspeed*v));
+	var ah = a.hspeed*h;
+	var av = a.vspeed*v;
+	var ax = a.x;
+	var ay = a.y;
+ 	var div = Math.max(Math.abs(ah), Math.abs(av));
 	if(div == 0)div = 1;
 	for(var i=0; i<div; i++){
-		px = a.x + i*a.hspeed/div;
-		py = a.y + i*a.vspeed/div;
-		if(a.x+i*a.hspeed/div < b.x+b.w && a.x+a.w+i*a.hspeed/div > b.x && a.y+i*a.vspeed/div<b.y+b.h && a.y+a.h+i*a.vspeed/div>b.y ){
+		px = a.x + i*ah/div;
+		py = a.y + i*av/div;
+		if(ax+i*ah/div < b.x+b.w && ax+a.w+i*ah/div > b.x && ay+i*av/div<b.y+b.h && ay+a.h+i*av/div>b.y ){
 			return true;
 		}
 	}
 	return false;
 }
 
+function boxCollision2(a,b,h,v){
+	var ah = a.hspeed*h;
+	var av = a.vspeed*v;
+	var ax = a.x-a.hspeed*(1-1*h);
+	var ay = a.y-a.vspeed*(1-1*v);
+ 	var div = Math.max(Math.abs(ah), Math.abs(av));
+	if(div == 0)div = 1;
+	for(var i=0; i<div; i++){
+		px = a.x + i*ah/div;
+		py = a.y + i*av/div;
+		if(ax+i*ah/div < b.x+b.w && ax+a.w+i*ah/div > b.x && ay+i*av/div<b.y+b.h && ay+a.h+i*av/div>b.y ){
+			return true;
+		}
+	}
+	return false;
+}
 
 function playerColllision(playera, b){
 	if(boxCollision(playera, b,1,1)){
-		if(boxCollision(playera, b,0,1)){
-			//b.vspeed += playera.vspeed;
-			//playera.y -= playera.vspeed;
-			//playera.vspeed += -playera.vspeed;
-			playera.y += playera.y<b.y?-b.h:b.h;
+		var hor = true;
+		var ver = true;
+		/*if(boxCollision2(playera, b,1,0)){
+			hor = true;
 		}
-		if(boxCollision(playera, b,1,0)){
-			//b.hspeed += playera.hspeed;
+		if(boxCollision2(playera, b,0,1)){
+			ver = true;
+		}*/
+		
+		if(hor){
+			b.hspeed += playera.hspeed;
 			//playera.x -= playera.hspeed;
-			//playera.hspeed += -playera.hspeed;
-			playera.x += playera.x<b.x?-b.w:b.w;
+			playera.hspeed += -playera.hspeed;
+			//playera.x += playera.x<b.x?-((playera.x+playera.w)-b.x):((b.x+b.w)-playera.x);
+			//b.x += b.x<playera.x?-((b.x+b.w)-playera.x):((playera.x+playera.w)-b.x);
 		}
-	}
+		if(ver){
+			b.vspeed += playera.vspeed;
+			//playera.y -= playera.vspeed;
+			playera.vspeed += -playera.vspeed;
+			//playera.y += playera.y<b.y?-((playera.y+playera.h)-b.y):((b.y+b.h)-playera.y);
+			//b.y += b.y<playera.y?-((b.y+b.h)-playera.y):((playera.y+playera.h)-b.y);
+		}
+	}	
 }
 
 function preciseColllision(player, b){
@@ -315,6 +340,13 @@ function preciseColllision(player, b){
 	}
 }
 
+function degToRad(deg){
+	return deg * (Math.PI/180);
+}
+
+function radToDeg(rad){
+	return rad / (Math.PI/180);
+}
 
 function death(){//player dies, score screen displayed
 	player1.isAlive = false;
