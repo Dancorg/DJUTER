@@ -121,7 +121,7 @@ function collisionLine(s,t,p){ // s,t = start and end objects, p = walls
     return r;
 }
 
-function collisionLinePoints(s1,s2,t1,t2,i){ // s,t = start and end objects, p = walls
+function collisionLinePoints(s1,s2,t1,t2,i, type){ // s,t = start and end objects, p = walls
     var r = true;
 	var a1 = [s1, s2];
 	var a2 = [t1, t2];
@@ -154,10 +154,19 @@ function collisionLinePoints(s1,s2,t1,t2,i){ // s,t = start and end objects, p =
 	var c1 = [iix - ww, iiy + hh];
 	var c2 = [iix + ww, iiy - hh];
 
-	if (!scanB(a1,a2,b1,b2) && !scanB(a1,a2,c1,c2))
-		r = false;
-	else{
-		return true;
+	if(type == "cross"){
+		if (!scanB(a1,a2,b1,b2) && !scanB(a1,a2,c1,c2))
+			r = false;
+		else{
+			return true;
+		}
+	}
+	if(type == "box"){
+		if (!scanB(a1,a2,b1,c2) && !scanB(a1,a2,c2,b2) && !scanB(a1,a2,b2,c1) && !scanB(a1,a2,c1,b1))
+			r = false;
+		else{
+			return true;
+		}
 	}
 
 	r = false;

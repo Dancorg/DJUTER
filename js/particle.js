@@ -91,14 +91,14 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 		}
 		for(j in boxes){
 			var box = boxes[j];
-			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box)){
+			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box,"box")){
 				this.death(i,"explosive");
 				return true;
 			}
 		}
 		for(j in players){
 			var p = players[j];
-			if(p.side != this.side && collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,p)){
+			if(p.side != this.side && collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,p,"cross")){
 				p.hspeed+=this.hspeed/8;
 				p.vspeed+=this.vspeed/8;
 				p.hp-=this.damage;
