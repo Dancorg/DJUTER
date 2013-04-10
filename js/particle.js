@@ -1,4 +1,4 @@
-function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
+function Particle(x,y,s,vspeed,hspeed,color,stage, collider, timer){
 	shape = new Shape();//
 	shape.graphics.beginFill(color).rect(0,0,s,s);
 	shape.x = x-s/2;
@@ -6,7 +6,8 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
 	shape.vspeed = vspeed;
 	shape.hspeed = hspeed;
 	shape.collider = collider;
-	shape.timer = 120;
+	shape.timer = timer;
+	shape.factor = timer;
 	shape.snapToPixel = true;
 	shape.cache(0,0,s,s);
 	shape.glow = new Shape();
@@ -24,7 +25,7 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
 		this.y += this.vspeed;
 		this.hspeed *= 0.9;
 		this.vspeed *= 0.9;
-		this.alpha -= 1/120;
+		this.alpha -= 1/this.factor;
 		this.timer--;
 		this.glow.x = this.x;
 		this.glow.y = this.y;
@@ -40,10 +41,17 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider){
 	particles.push(shape);
 }
 
-function BulletDeath(i){
-	//particles.splice(i,1);
-	particles[i] = null;
+function BulletDeath(i,type){
+	console.log(particles.length);
 	stage.removeChild(this);
+	if(type == "explosive"){
+		for(var j=0;j<5;j++){
+			Particle(this.x+this.hspeed/2+Math.random()*5,this.y+this.vspeed/2+Math.random()*5,4,Math.random()*20-10,Math.random()*20-10,this.color,stage, false, 10);
+		}
+	}
+	particles.splice(i,1);
+	//particles[i] = null;
+	
 }
 
 function Coin(x,y,stage){
@@ -63,9 +71,11 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 	shape.graphics.setStrokeStyle(size1,"butt").beginStroke(color).moveTo(0,0).lineTo(size2,0);
 	shape.x = x;
 	shape.y = y;
+	shape.color = color;
 	shape.rotation = angle;
 	shape.drop = drop;
 	shape.time = time;
+	shape.cache(-size2*1,-size1*1,size2*2,size1*2);
 	shape.damage = damage;
 	shape.hspeed = hspeed;
 	shape.vspeed = vspeed;
@@ -75,20 +85,31 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 	shape.death = BulletDeath;
 	shape.update = function(i){
 		this.time--;
+		if(this.time <= 0){
+			this.death(i,"quiet");
+			return true;
+		}
+		for(j in boxes){
+			var box = boxes[j];
+			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box)){
+				this.death(i,"explosive");
+				return true;
+			}
+		}
+		for(j in players){
+			var p = players[j];
+			if(p.side != this.side && collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,p)){
+				p.hspeed+=this.hspeed/8;
+				p.vspeed+=this.vspeed/8;
+				p.hp-=this.damage;
+				this.death(i,"explosive");
+				return true;
+			}
+		}
+		this.hspeed*=this.drop;
+		this.vspeed*=this.drop;
 		this.x += this.hspeed;
 		this.y += this.vspeed;
-		for(i in boxes){
-			var box = boxes[i];
-			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box)){
-				this.death(i);
-			}
-		}
-		for(i in players){
-			var p = players[i];
-			if(p.side != this.side && collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,p)){
-				this.death(i);
-			}
-		}
 	};
 	particles.push(shape);
 }

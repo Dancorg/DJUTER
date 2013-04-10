@@ -135,18 +135,22 @@ function startLevel(){
 	background.graphics.beginRadialGradientFill(["#112","#27B"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
-	ene = Enemy(50,50,stage, 1);
-	ene1 = Enemy(30,50,stage, 1);
-	ene2 = Enemy(50,30,stage, 1);
-	ene3 = Enemy(80,50,stage, 1);
-	ene4 = Enemy(50,80,stage, 1);
+	ene = Enemy(150,150,stage, 1);
+	ene1 = Enemy(130,150,stage, 1);
+	ene2 = Enemy(150,130,stage, 1);
+	ene3 = Enemy(180,150,stage, 1);
+	ene4 = Enemy(150,180,stage, 1);
+	ene5 = Enemy(30,50,stage, 1);
+	ene6 = Enemy(50,30,stage, 1);
+	ene7 = Enemy(80,50,stage, 1);
+	ene8 = Enemy(50,80,stage, 1);
 	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
 	player1.vspeed = 0;*/
 	player2 = new Player("Player 2",2, gamewidth/2+100, 60+200,"250,180,40", stage);
 	player2.vspeed = 0;
 	//player1 = ene;
 	ene.assumeControl();
-	players = [ player2,ene,ene1,ene2,ene3,ene4];
+	players = [ player2,ene,ene1,ene2,ene3,ene4,ene5,ene6,ene7,ene8];
 	
 	
 	platformFirstSpawn();
@@ -169,13 +173,6 @@ function startLevel(){
 	stage.addChild(gui);
 	//Box(gamewidth/2-20,80,60,15,stage,"up");
 	
-	
-	line = new Shape();
-	line.graphics.setStrokeStyle(4,"butt").beginStroke('rgba(220,50,80,1)').moveTo(0,0).lineTo(20,0);
-	line.x = 250;
-	line.y = 50;
-	line.rotation = 45;
-	stage.addChild(line);
 }
 
 function tick(){
@@ -202,9 +199,9 @@ function tick(){
 		}
 	}
 	
-	for(i in particles){
+	for(var i = particles.length-1;i >= 0;i--){
 		var part = particles[i];
-		if(part)part.update(i);
+		part.update(i);
 	}
 	for(i in coins){
 		var c = coins[i];
@@ -224,10 +221,11 @@ function tick(){
 			stage.removeChild(c);
 		}
 	}
-	for(i in players){
+	for(var i = players.length-1;i >= 0;i--){
 		var p = players[i];
-		p.update();
+		p.update(i);
 	}
+
 	
 	stage.update();
 }
@@ -352,7 +350,7 @@ function death(){//player dies, score screen displayed
 	endtimer = 30;
 	stage.removeChild(player1);
 	for(var i=0;i<10;i++){
-		Particle(player1.x+i,player1.y+Math.random()*10,10,Math.random()*20-10,Math.random()*30-15,'rgba(180,40,40,1)',stage);
+		Particle(player1.x+i,player1.y+Math.random()*10,10,Math.random()*20-10,Math.random()*30-15,'rgba(180,40,40,1)',stage, false, 120);
 	}
 	
 	var deathBox = new Shape();
@@ -366,16 +364,16 @@ function death(){//player dies, score screen displayed
 
 function coinExplosion(x,y){
 	for(var i=0;i<10;i++){
-		Particle(x+i,y+Math.random()*10,3,Math.random()*20-10,Math.random()*20-10,'rgba(200,170,30,1)',stage, false);
+		Particle(x+i,y+Math.random()*10,3,Math.random()*20-10,Math.random()*20-10,'rgba(200,170,30,1)',stage, false, 120);
 	}
 }
 
 function boxExplosion(a,b){ //platform explosion
 	for(var i=0;i<Math.ceil(a.w*0.1);i++){
-		Particle(a.x+i*10,a.y+Math.random()*a.h,5,Math.random()*20-10,Math.random()*30-15,a.color,stage, true);
+		Particle(a.x+i*10,a.y+Math.random()*a.h,5,Math.random()*20-10,Math.random()*30-15,a.color,stage, true, 120);
 	}
 	for(var i=0;i<Math.ceil(b.w*0.1);i++){
-		Particle(b.x+i*10,b.y+Math.random()*b.h,5,Math.random()*20-10,Math.random()*30-15,b.color,stage, true);
+		Particle(b.x+i*10,b.y+Math.random()*b.h,5,Math.random()*20-10,Math.random()*30-15,b.color,stage, true, 120);
 	}
 }
 

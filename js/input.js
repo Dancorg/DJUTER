@@ -109,8 +109,10 @@ function handleTouchEnd(e){
 function handleMouseDown(e){
 	var mX = e.clientX - canvas.offsetLeft;
 	var mY = e.clientY - canvas.offsetTop;
-	player2.attack = true;
-	player2.angle = Math.atan2(mY-player2.y,mX-player2.x);
+	if(player2){
+		player2.attack = true;
+		player2.angle = Math.atan2(mY-player2.y,mX-player2.x);
+	}
 	/*if(e.clientX  <200+canvasx)left = true;
 	if((e.clientX  >=200+canvasx && e.clientX  <=440+canvasx) || e.clientY<300+canvasY){
 		jump = true;
@@ -122,6 +124,7 @@ function handleMouseDown(e){
 function handleMouseMove(e){
 	var mX = e.clientX - canvas.offsetLeft;
 	var mY = e.clientY - canvas.offsetTop;
+	if(player2)
 	player2.angle = Math.atan2(mY-player2.y,mX-player2.x);
 }
 
