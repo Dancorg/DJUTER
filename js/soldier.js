@@ -1,0 +1,36 @@
+function Soldier(x, y, stage, side){
+	shape = new Shape();
+	var s = 10;	
+	shape.controllable = true;
+	shape.isAlive = true;
+	shape.side = side;
+	shape.color = 'rgba(220,50,80,1)';
+	shape.graphics.beginFill('rgba(220,50,80,1)').rect(0,0,s,s).beginFill('rgba(220,50,80,0.1)').rect(-3,-3,s+6,s+6);
+	shape.s = s;
+	shape.w = s;
+	shape.h = s;
+	shape.x = x;
+	shape.y = y;
+	shape.maxspeed = 6;
+	shape.hp = 100;
+	shape.left = 0;
+	shape.right = 0;
+	shape.up = 0;
+	shape.down = 0;
+	shape.snapToPixel = true;
+	shape.cache(-3,-3,s+6,s+6);
+	shape.vspeed = 0;
+	shape.hspeed = 0;
+	stage.addChild(shape);
+	shape.target = null;
+	shape.formx = Math.round(Math.random()*120)-60;
+	shape.formy = Math.round(Math.random()*120)-60;
+	shape.counters = [0,0];
+	shape.update = playerUpdate;
+	shape.ai = aiZUpdate;
+	shape.defaultai = aiZUpdate;
+	shape.death = playerDeath;
+	shape.assumeControl = assumeControl;
+	shape.abandonControl = abandonControl;
+	return shape;
+}

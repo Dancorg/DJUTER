@@ -143,7 +143,7 @@ function startLevel(){
 	ene5 = Enemy(30,50,stage, 1);
 	ene6 = Enemy(50,30,stage, 1);
 	ene7 = Enemy(80,50,stage, 1);
-	ene8 = Enemy(50,80,stage, 1);
+	ene8 = Enemy(50,80,stage, 2);
 	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
 	player1.vspeed = 0;*/
 	player2 = new Player("Player 2",2, gamewidth/2+100, 60+200,"250,180,40", stage);

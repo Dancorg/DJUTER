@@ -64,8 +64,8 @@ var playerDeath = function(j){
 var playerUpdate = function(j){
 	this.ai();
 	if(this.isAlive){
-		/*if(maincounter%3==0){
-			Particle(this.x+5,this.y+5,5,0,0,this.color,stage, false);}*/	
+		if(maincounter%3==0){
+			Particle(this.x+5,this.y+5,5,0,0,this.color,stage, false, 50);}
 		if(!this.attack && this.energy < this.maxenergy)this.energy++;
 		
 		for(i in boxes ){
