@@ -50,10 +50,13 @@ var aiZUpdate = function(){
 		if(this.x > player1.x+this.formx+this.s)this.left = true;
 	}
 	if((!this.target && this.counters[0]%15 == 0)|| this.counters[0]%60 == 0){
-		if(!collisionLine(this,player2,boxes)){
-			this.target = player2;
+		this.target = null;
+		for(var t in players){
+			var p = players[t];
+			if(p.side != this.side && !collisionLine(this,p,boxes)){
+				this.target = p;
+			}
 		}
-		else this.target = null;
 	}
 	if(this.counters[1] == 0){
 		this.formx = Math.round(Math.random()*120)-60;
