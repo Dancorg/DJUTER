@@ -1,8 +1,7 @@
 function Player(name, side, x, y, color, stage){
 	shape = new Shape();
 	var s = 10;
-	shape.controllable = true;
-	shape.name = name;
+	shape.controlled = false;
 	shape.side = side;
 	shape.isAlive = true;
 	shape.color = 'rgba('+color+',1)';
@@ -12,6 +11,7 @@ function Player(name, side, x, y, color, stage){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
+	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 4;
 	shape.hp = 100;
 	shape.left = 0;
@@ -29,18 +29,27 @@ function Player(name, side, x, y, color, stage){
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*60);
 	shape.formy = Math.round(Math.random()*60);
-	shape.counters = [0];
+	shape.counters = [0,0];
 	shape.update = playerUpdate;
-	shape.ai = function(){return true;};
+	shape.ai = aiSUpdate;
 	shape.defaultai = aiSUpdate;
 	shape.death = playerDeath;
 	stage.addChild(shape);
+	shape.assumeControl = assumeControl;
+	shape.abandonControl = abandonControl;
+	// DIBUJAR UN ARO QUE REPRESENTE LOS HP
+	shape.halo = new Shape();
+	shape.halo.graphics.beginStroke(shape.color).rect(0,0,s,s).beginFill('rgba('+color+',0.1)').rect(-3,-3,s+6,s+6);
 	return shape;
 }
 
 var playerDeath = function(j){
 	this.isAlive = false;
 		//endtimer = 30;	
+		if(this.controlled){
+			if(this.side == 1)setNewPlayer(1);
+			else setNewPlayer(2);
+		}
 		stage.removeChild(this);
 		for(var i=0;i<10;i++){
 			Particle(this.x+i,this.y+Math.random()*10,6,Math.random()*20-10,Math.random()*20-10,'rgba(180,40,40,1)',stage, false, 40);
@@ -64,9 +73,9 @@ var playerDeath = function(j){
 var playerUpdate = function(j){
 	this.ai();
 	if(this.isAlive){
-		if(maincounter%3==0){
+		if(maincounter%3==0 && this.controlled){
 			Particle(this.x+5,this.y+5,5,0,0,this.color,stage, false, 50);}
-		if(!this.attack && this.energy < this.maxenergy)this.energy++;
+		if(/*!this.attack &&*/ this.energy < this.maxenergy)this.energy++;
 		
 		for(i in boxes ){
 			b = boxes[i];	
@@ -86,6 +95,7 @@ var playerUpdate = function(j){
 		if(!(this.left || this.right) || Math.abs(this.hspeed)>this.maxspeed*diagonal) this.hspeed/=2;
 		if(!(this.up || this.down)|| Math.abs(this.vspeed)>this.maxspeed*diagonal) this.vspeed/=2;
 
+		//this.other = null;
 		for(i in players ){
 			b = players[i];
 			if(b != this)playerColllision(this, b);
@@ -96,7 +106,7 @@ var playerUpdate = function(j){
 			var vspeed = Math.sin(this.angle)*20;
 			Projectile(this,this.x+this.s/2,this.y+this.s/2,20,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,10,stage);
 		}
-		else if(this.energy<=10)this.attack = false;
+		//else if(this.energy<=10)this.attack = false;
 		if(this.hp<=0)this.death(j);
 	}
 }
@@ -104,4 +114,52 @@ var playerUpdate = function(j){
 
 
 var aiSUpdate = function(){
+	if(this.target && pointDistanceSquared(this.x,this.y,this.target.x,this.target.y)<12500){
+		this.left = this.right = this.up = this.down = false;
+		if(this.y < this.target.y-this.s)this.up = true;
+		if(this.y > this.target.y+this.s)this.down = true;
+		if(this.x < this.target.x-this.s)this.left = true;
+		if(this.x > this.target.x+this.s)this.right = true;
+	}else{
+		this.left = this.right = this.up = this.down = false;
+		if(this.y < player2.y+this.formy-this.s)this.down = true;
+		if(this.y > player2.y+this.formy+this.s)this.up = true;
+		if(this.x < player2.x+this.formx-this.s)this.right = true;
+		if(this.x > player2.x+this.formx+this.s)this.left = true;
+	}
+	if((!this.target && this.counters[0]%15 == 0)|| this.counters[0]%60 == 0){
+		this.target = null;
+		for(var t in players){
+			var p = players[t];
+			if(p.side != this.side && !collisionLine(this,p,boxes)){
+				this.target = p;
+			}
+		}
+	}
+	if(this.target && !collisionLine(this,this.target,boxes) && pointDistanceSquared(this.x,this.y,this.target.x,this.target.y)<20000){
+		this.angle = Math.atan2(this.target.y-this.y,this.target.x-this.x);
+		this.attack = true;
+	}
+	else{
+		this.attack = false;
+	}
+	
+	if(this.counters[1] == 0){
+		this.formx = Math.round(Math.random()*120)-60;
+		this.formy = Math.round(Math.random()*120)-60;
+	}
+	this.counters[0]--;
+	if(this.counters[0] < 0)this.counters[0] = 60;
+	this.counters[1]--;
+	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+30);
+}
+
+function setNewPlayer(side){
+	for(i in players){
+		var p = players[i];
+		if(p.side == side && !p.controlled){
+			p.assumeControl();
+			return true;
+		}
+	}
 }

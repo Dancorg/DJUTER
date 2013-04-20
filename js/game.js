@@ -144,13 +144,20 @@ function startLevel(){
 	ene6 = Enemy(50,30,stage, 1);
 	ene7 = Enemy(80,50,stage, 1);
 	ene8 = Enemy(50,80,stage, 1);
+	ene9 = Enemy(30,70,stage, 1);
+	ene10 = Enemy(70,30,stage, 1);
+	ene11 = Enemy(80,70,stage, 1);
+	ene12 = Enemy(70,80,stage, 1);
 	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
 	player1.vspeed = 0;*/
 	player2 = new Player("Player 2",2, gamewidth/2+100, 60+200,"250,180,40", stage);
-	player2.vspeed = 0;
+	player3 = new Player("Player 2",2, gamewidth/2+150, 60+200,"250,180,40", stage);
+	player4 = new Player("Player 2",2, gamewidth/2+150, 60+200,"250,180,40", stage);
+	player5 = new Player("Player 2",2, gamewidth/2+150, 60+200,"250,180,40", stage);
 	//player1 = ene;
 	ene.assumeControl();
-	players = [ player2,ene,ene1,ene2,ene3,ene4,ene5,ene6,ene7,ene8];
+	player2.assumeControl();
+	players = [ player2,player3,player4,player5,ene,ene1,ene2,ene3,ene4,ene5,ene6,ene7,ene8,ene9,ene10,ene11,ene12];
 	
 	
 	platformFirstSpawn();
@@ -301,6 +308,9 @@ function playerColllision(playera, b){
 			//playera.y += playera.y<b.y?-((playera.y+playera.h)-b.y):((b.y+b.h)-playera.y);
 			//b.y += b.y<playera.y?-((b.y+b.h)-playera.y):((playera.y+playera.h)-b.y);
 		}
+		playera.other = b;
+		b.other = playera;
+		return b;
 	}	
 }
 

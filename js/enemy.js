@@ -1,9 +1,9 @@
 function Enemy(x, y, stage, side){
 	shape = new Shape();
 	var s = 10;	
-	shape.controllable = true;
-	shape.isAlive = true;
+	shape.controlled = false;
 	shape.side = side;
+	shape.isAlive = true;
 	shape.color = 'rgba(220,50,80,1)';
 	shape.graphics.beginFill('rgba(220,50,80,1)').rect(0,0,s,s).beginFill('rgba(220,50,80,0.1)').rect(-3,-3,s+6,s+6);
 	shape.s = s;
@@ -11,17 +11,20 @@ function Enemy(x, y, stage, side){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
+	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 6;
 	shape.hp = 100;
 	shape.left = 0;
 	shape.right = 0;
 	shape.up = 0;
 	shape.down = 0;
+	shape.energy = 0;
+	shape.maxenergy = 100;	
+	shape.attack = false;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.vspeed = 0;
 	shape.hspeed = 0;
-	stage.addChild(shape);
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*120)-60;
 	shape.formy = Math.round(Math.random()*120)-60;
@@ -30,6 +33,7 @@ function Enemy(x, y, stage, side){
 	shape.ai = aiZUpdate;
 	shape.defaultai = aiZUpdate;
 	shape.death = playerDeath;
+	stage.addChild(shape);
 	shape.assumeControl = assumeControl;
 	shape.abandonControl = abandonControl;
 	return shape;
@@ -66,15 +70,22 @@ var aiZUpdate = function(){
 	if(this.counters[0] < 0)this.counters[0] = 60;
 	this.counters[1]--;
 	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+30);
+	
+	if(this.other && this.other.side != this.side){
+		this.other.hp -= 10;
+	}
 }
 
 function assumeControl(){
 	this.ai = function(){return true;};
+	this.controlled = true;
+	this.left = this.right = this.up = this.down = false;
 	if(this.side == 1)player1 = this;
 	if(this.side == 2)player2 = this;
 }
 
 function abandonControl(){
+	this.controlled = false;
 	this.ai = this.defaultai;
 }
 
