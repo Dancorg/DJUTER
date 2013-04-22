@@ -1,5 +1,5 @@
 function Player(name, side, x, y, color, stage){
-	shape = new Shape();
+	var shape = new Shape();
 	var s = 10;
 	shape.controlled = false;
 	shape.side = side;
@@ -11,6 +11,7 @@ function Player(name, side, x, y, color, stage){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
+	shape.melee = false;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 4;
 	shape.hp = 100;
@@ -34,12 +35,16 @@ function Player(name, side, x, y, color, stage){
 	shape.ai = aiSUpdate;
 	shape.defaultai = aiSUpdate;
 	shape.death = playerDeath;
-	stage.addChild(shape);
 	shape.assumeControl = assumeControl;
 	shape.abandonControl = abandonControl;
-	// DIBUJAR UN ARO QUE REPRESENTE LOS HP
 	shape.halo = new Shape();
-	shape.halo.graphics.beginStroke(shape.color).rect(0,0,s,s).beginFill('rgba('+color+',0.1)').rect(-3,-3,s+6,s+6);
+	shape.halo.graphics.setStrokeStyle(1, "round").beginStroke(shape.color).drawCircle(0,0,s-1);
+	shape.halo.x = shape.x;
+	shape.halo.y = shape.y;
+	shape.halo.regX = -s/2;
+	shape.halo.regY = -s/2;
+	stage.addChild(shape.halo);
+	stage.addChild(shape);
 	return shape;
 }
 
@@ -51,6 +56,7 @@ var playerDeath = function(j){
 			else setNewPlayer(2);
 		}
 		stage.removeChild(this);
+		stage.removeChild(this.halo);
 		for(var i=0;i<10;i++){
 			Particle(this.x+i,this.y+Math.random()*10,6,Math.random()*20-10,Math.random()*20-10,'rgba(180,40,40,1)',stage, false, 40);
 		}
@@ -86,6 +92,12 @@ var playerUpdate = function(j){
 			this.death(j);
 		this.y += this.vspeed;
 		this.x += this.hspeed;
+		if(this.halo){
+			//this.halo.graphics.clear().setStrokeStyle(2, "round").beginStroke(shape.color).drawCircle(0,0,50);
+			this.halo.alpha = this.hp/100;
+			this.halo.x = this.x;
+			this.halo.y = this.y;
+		}
 		var diagonal = (((this.left || this.right)&&(this.down || this.up)))?0.71:1;
 		
 		if(this.left && this.hspeed>-this.maxspeed*diagonal)this.hspeed -= 0.5*diagonal;
@@ -95,16 +107,28 @@ var playerUpdate = function(j){
 		if(!(this.left || this.right) || Math.abs(this.hspeed)>this.maxspeed*diagonal) this.hspeed/=2;
 		if(!(this.up || this.down)|| Math.abs(this.vspeed)>this.maxspeed*diagonal) this.vspeed/=2;
 
-		//this.other = null;
+		this.other = null;
 		for(i in players ){
 			b = players[i];
 			if(b != this)playerColllision(this, b);
 		}
-		if(this.attack && this.energy>=10 && maincounter%3==0){
+		if(!this.melee && this.attack && this.energy>=10 && maincounter%3==0){
 			this.energy -= 10;
 			var hspeed = Math.cos(this.angle)*20;
 			var vspeed = Math.sin(this.angle)*20;
 			Projectile(this,this.x+this.s/2,this.y+this.s/2,20,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,10,stage);
+		}
+		if(this == player1)console.log(this.attack);
+		if(this.melee){
+			if(this.attack && this.energy >= 60){
+				if(this == player1)console.log("melee attack");
+				this.energy -= 60;
+				this.vspeed *= 4;
+				this.hspeed *= 4;
+			}
+			if(this.other && this.other.side != this.side){
+				this.other.hp -= 15;
+			}
 		}
 		//else if(this.energy<=10)this.attack = false;
 		if(this.hp<=0)this.death(j);
@@ -114,7 +138,9 @@ var playerUpdate = function(j){
 
 
 var aiSUpdate = function(){
-	if(this.target && pointDistanceSquared(this.x,this.y,this.target.x,this.target.y)<12500){
+	if(this.target)
+		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
+	if(this.target && dis<12500){
 		this.left = this.right = this.up = this.down = false;
 		if(this.y < this.target.y-this.s)this.up = true;
 		if(this.y > this.target.y+this.s)this.down = true;
@@ -136,7 +162,7 @@ var aiSUpdate = function(){
 			}
 		}
 	}
-	if(this.target && !collisionLine(this,this.target,boxes) && pointDistanceSquared(this.x,this.y,this.target.x,this.target.y)<20000){
+	if(this.target && !collisionLine(this,this.target,boxes) && dis<20000){
 		this.angle = Math.atan2(this.target.y-this.y,this.target.x-this.x);
 		this.attack = true;
 	}

@@ -1,5 +1,5 @@
 function Soldier(x, y, stage, side){
-	shape = new Shape();
+	var shape = new Shape();
 	var s = 10;
 	shape.controlled = true;
 	shape.name = name;

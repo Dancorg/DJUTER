@@ -8,6 +8,10 @@ var players;
 var boxes;
 var particles;
 var coins;
+var objectives;
+
+var res1 = 0;
+var res2 = 0;
 
 var keyup = 38;
 var keyleft = 37;
@@ -18,7 +22,7 @@ var keyw = 87;
 var keya = 65;
 var keyd = 68;
 var keys = 83;
-var keyspace = 83;
+var keyspace = 32;
 var left = 0;
 var right = 0;
 var jump = 0;
@@ -50,9 +54,12 @@ function reset(){
 	boxes = [];
 	players = [];
 	particles = [];
+	objectives = [];
 	coins = [];
 	score1 = 0;	
 	score2 = 0;
+	res1 = 0;
+	res2 = 0;
 	boxSpawn = 0;
 	diff = 0;
 	endtimer = -1;
@@ -60,8 +67,8 @@ function reset(){
 }
 
 function resizeCanvas(){
-	var cwidth = $('#screen').width();
-	var cheight = $('#screen').height();
+	var cwidth = $('#body').width();
+	var cheight = $('#body').height();
 	if(cwidth < gamewidth || cheight < gameheight){
 		switchFullscreen();
 		var minim = Math.min(cwidth,cheight*(4/3));
@@ -110,8 +117,12 @@ function init(){
 function startMenu(){
 	reset();
 	Ticker.setPaused(true);
+	var background = new Shape();
+	background.graphics.beginRadialGradientFill(["#080822","#248"],[0.99,0.01],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
+	background.cache(0,0,gamewidth,gameheight);
+	stage.addChild(background);
 	var startBox = new Shape();
-	startBox.graphics.beginFill('rgba(120,180,250,1)').rect(0,-8,gamewidth,86).beginFill('rgba(220,120,10,0.9)').rect(0,0,gamewidth,70);
+	startBox.graphics.beginFill('rgba(220,180,50,1)').rect(0,-8,gamewidth,86).beginFill('rgba(150,20,20,0.9)').rect(0,0,gamewidth,70);
 	startBox.x=0;
 	startBox.y=150;
 	stage.addChild(startBox);
@@ -131,10 +142,11 @@ function startMenu(){
 function startLevel(){
 	reset();
 	Ticker.setPaused(false);
-	background = new Shape();
+	var background = new Shape();
 	background.graphics.beginRadialGradientFill(["#112","#27B"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
+	objectives = [Objective(Math.random()*gamewidth, Math.random()*gameheight, 50),Objective(Math.random()*gamewidth, Math.random()*gameheight, 50)];
 	ene = Enemy(150,150,stage, 1);
 	ene1 = Enemy(130,150,stage, 1);
 	ene2 = Enemy(150,130,stage, 1);
@@ -174,9 +186,15 @@ function startLevel(){
 	energyText2 = new Text("ENERGY: ", "12px impact", "#AFF");
 	energyText2.x = gamewidth - 140;
 	energyText2.y = 25;
+	hpText1 = new Text("HP: ", "12px impact", "#AFF");
+	hpText1.x = 10;
+	hpText1.y = 40;
+	hpText2 = new Text("HP: ", "12px impact", "#AFF");
+	hpText2.x = gamewidth - 140;
+	hpText2.y = 40;
 	scoreBack = new Shape();
-	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,150,50,0,0,30,0).drawRoundRectComplex(gamewidth-150,0,150,50,0,0,0,30)//.rect(0,0,150,30);
-	gui.addChild(scoreBack, scoreText1, scoreText2, energyText1, energyText2);		
+	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,150,60,0,0,20,0).drawRoundRectComplex(gamewidth-150,0,150,60,0,0,0,20)//.rect(0,0,150,30);
+	gui.addChild(scoreBack, scoreText1, scoreText2, energyText1, energyText2,hpText1,hpText2);		
 	stage.addChild(gui);
 	//Box(gamewidth/2-20,80,60,15,stage,"up");
 	
@@ -190,6 +208,10 @@ function tick(){
 	scoreText2.text = "SCORE2: " + score2;
 	energyText1.text = "ENERGY: " + player1.energy;
 	energyText2.text = "ENERGY: " + player2.energy;
+	hpText1.text = "HP: " + player1.hp;
+	hpText2.text = "HP: " + player2.hp;
+	hpText1.color = player1.hp<60?player1.hp<30?"#F44":"#FAA":"#AFF"
+	hpText2.color = player2.hp<60?player2.hp<30?"#F44":"#FAA":"#AFF"
 	stage.setChildIndex(gui,0);
 	
 	for(i in boxes){
@@ -231,12 +253,21 @@ function tick(){
 	for(var i = players.length-1;i >= 0;i--){
 		var p = players[i];
 		p.update(i);
+	}	
+	if(res1 >= 500){
+		res1-=500;
+		players.push(Enemy(0,gameheight/2,stage, 1));
 	}
-
-	
+	if(res2 >= 500){
+		res2-=500;
+		players.push(Player("Player 2",2, gamewidth, gameheight/2,"250,180,40", stage));
+	}
+	for(i in objectives){
+		var o = objectives[i];
+		o.update();
+	}
 	stage.update();
 }
-
 
 function platformFirstSpawn(){
 	var x,y,w,h;
@@ -292,8 +323,7 @@ function playerColllision(playera, b){
 		}
 		if(boxCollision2(playera, b,0,1)){
 			ver = true;
-		}*/
-		
+		}*/	
 		if(hor){
 			b.hspeed += playera.hspeed;
 			//playera.x -= playera.hspeed;
@@ -315,35 +345,23 @@ function playerColllision(playera, b){
 }
 
 function preciseColllision(player, b){
-	var choque;
 	if(boxCollision(player, b,1,1)){
-		if(py<b.y)
-			choque = "floor";
-		else if(px+player.s*0.5<b.x) 
-			choque = "lwall";
-		else if(px+player.s*0.5>b.x+b.w)
-			choque = "rwall";
-		else if(py+player.s>b.y+b.h && b.speed-player.vspeed>0)
-			choque = "ceiling";
-	}
-	
-	switch(choque){
-		case "floor":
-			if(player.vspeed>0)
+		if(py<b.y){
+			if(player.vspeed > 0)
 				player.vspeed = 0;
-			break;
-		case "ceiling":
-			if(player.vspeed<0)
+		}
+		if(px+player.s*0.5<b.x){ 
+			if(player.hspeed > 0)
+				player.hspeed = 0;
+		}
+		if(px+player.s*0.5>b.x+b.w){
+			if(player.hspeed < 0)
+				player.hspeed = 0;
+		}
+		else if(py+player.s>b.y+b.h){
+			if(player.vspeed < 0)
 				player.vspeed = 0;
-			break;
-		case "lwall":
-			if(player.hspeed>0)
-				player.hspeed = 0;
-			break;
-		case "rwall":
-			if(player.hspeed<0)
-				player.hspeed = 0;
-			break;
+		}
 	}
 }
 

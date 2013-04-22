@@ -1,5 +1,5 @@
 function Enemy(x, y, stage, side){
-	shape = new Shape();
+	var shape = new Shape();
 	var s = 10;	
 	shape.controlled = false;
 	shape.side = side;
@@ -11,6 +11,7 @@ function Enemy(x, y, stage, side){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
+	shape.melee = true;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 6;
 	shape.hp = 100;
@@ -33,14 +34,23 @@ function Enemy(x, y, stage, side){
 	shape.ai = aiZUpdate;
 	shape.defaultai = aiZUpdate;
 	shape.death = playerDeath;
-	stage.addChild(shape);
 	shape.assumeControl = assumeControl;
 	shape.abandonControl = abandonControl;
+	shape.halo = new Shape();
+	shape.halo.graphics.setStrokeStyle(1, "round").beginStroke(shape.color).drawCircle(0,0,s);
+	shape.halo.x = shape.x;
+	shape.halo.y = shape.y;
+	shape.halo.regX = -s/2;
+	shape.halo.regY = -s/2;
+	stage.addChild(shape.halo);
+	stage.addChild(shape);
 	return shape;
 }
 
 var aiZUpdate = function(){
-	if(this.target && pointDistanceSquared(this.x,this.y,this.target.x,this.target.y)<22500){
+	if(this.target)
+		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
+	if(this.target && dis<22500){
 		this.left = this.right = this.up = this.down = false;
 		if(this.y < this.target.y-this.s)this.down = true;
 		if(this.y > this.target.y+this.s)this.up = true;
@@ -62,6 +72,11 @@ var aiZUpdate = function(){
 			}
 		}
 	}
+	if(this.target && dis<20000){
+		this.attack = true;
+	}
+	else this.attack = false;
+	
 	if(this.counters[1] == 0){
 		this.formx = Math.round(Math.random()*120)-60;
 		this.formy = Math.round(Math.random()*120)-60;
@@ -71,9 +86,7 @@ var aiZUpdate = function(){
 	this.counters[1]--;
 	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+30);
 	
-	if(this.other && this.other.side != this.side){
-		this.other.hp -= 10;
-	}
+
 }
 
 function assumeControl(){

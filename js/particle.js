@@ -1,5 +1,5 @@
 function Particle(x,y,s,vspeed,hspeed,color,stage, collider, timer){
-	shape = new Shape();//
+	var shape = new Shape();//
 	shape.graphics.beginFill(color).rect(0,0,s,s);
 	shape.x = x-s/2;
 	shape.y = y-s/2;
@@ -42,7 +42,6 @@ function Particle(x,y,s,vspeed,hspeed,color,stage, collider, timer){
 }
 
 function BulletDeath(i,type){
-	console.log(particles.length);
 	stage.removeChild(this);
 	if(type == "explosive"){
 		for(var j=0;j<5;j++){
