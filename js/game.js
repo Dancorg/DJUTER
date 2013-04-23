@@ -146,7 +146,7 @@ function startLevel(){
 	background.graphics.beginRadialGradientFill(["#112","#27B"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
-	objectives = [Objective(Math.random()*gamewidth, Math.random()*gameheight, 50),Objective(Math.random()*gamewidth, Math.random()*gameheight, 50)];
+	objectives = [Base(Math.random()*gamewidth, Math.random()*gameheight, 50),Base(Math.random()*gamewidth, Math.random()*gameheight, 50),Objective(Math.random()*gamewidth, Math.random()*gameheight, 70)];
 	ene = Enemy(150,150,stage, 1);
 	ene1 = Enemy(130,150,stage, 1);
 	ene2 = Enemy(150,130,stage, 1);
