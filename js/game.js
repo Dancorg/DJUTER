@@ -204,6 +204,8 @@ function tick(){
 	hpText2.color = player2.hp<60?player2.hp<30?"#F44":"#FAA":"#AFF"
 	stage.setChildIndex(gui,0);
 	
+	console.log(player2.vspeed, ((player2.left || player2.right)&&(player2.down || player2.up)));
+	
 	for(i in boxes){
 		var box = boxes[i];
 		box.y+=box.speed; //move the box
@@ -222,6 +224,7 @@ function tick(){
 		var part = particles[i];
 		part.update(i);
 	}
+	
 	for(i in coins){
 		var c = coins[i];
 		c.y++;
