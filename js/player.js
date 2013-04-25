@@ -13,13 +13,14 @@ function Player(name, side, x, y, color, stage){
 	shape.y = y;
 	shape.melee = false;
 	shape.other = null; // stores the other player it is colliding with
-	shape.maxspeed = 4;
+	shape.maxspeed = 2;
 	shape.hp = 100;
 	shape.left = 0;
 	shape.right = 0;
 	shape.up = 0;
 	shape.down = 0;
 	shape.energy = 0;
+	shape.firerate = 5;
 	shape.maxenergy = 100;
 	shape.attack = false;
 	shape.angle = 0;
@@ -112,13 +113,13 @@ var playerUpdate = function(j){
 			b = players[i];
 			if(b != this)playerColllision(this, b);
 		}
-		if(!this.melee && this.attack && this.energy>=10 && maincounter%3==0){
+		if(!this.melee && this.attack && this.energy>=10 && maincounter%this.firerate==0){
 			this.energy -= 10;
 			var hspeed = Math.cos(this.angle)*20;
 			var vspeed = Math.sin(this.angle)*20;
 			Projectile(this,this.x+this.s/2,this.y+this.s/2,20,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,10,stage);
 		}
-		if(this == player1)console.log(this.attack);
+		//if(this == player1)console.log(this.attack);
 		if(this.melee){
 			if(this.attack && this.energy >= 60){
 				if(this == player1)console.log("melee attack");
