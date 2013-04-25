@@ -13,7 +13,7 @@ function Enemy(x, y, stage, side){
 	shape.y = y;
 	shape.melee = true;
 	shape.other = null; // stores the other player it is colliding with
-	shape.maxspeed = 6;
+	shape.maxspeed = 3;
 	shape.hp = 100;
 	shape.left = 0;
 	shape.right = 0;
