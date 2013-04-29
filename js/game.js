@@ -10,6 +10,9 @@ var particles;
 var coins;
 var objectives;
 
+var stats1;
+var stats2;
+
 var res1 = 0;
 var res2 = 0;
 
@@ -64,6 +67,8 @@ function reset(){
 	diff = 0;
 	endtimer = -1;
 	maincounter=0;
+	stats1 = {"hp":100, "energy":100, "damage":25}; // jump speed, speed
+	stats2 = {"hp":100, "energy":100, "damage":15}; // range, rate of fire, impulse, speed
 }
 
 function resizeCanvas(){
@@ -131,7 +136,7 @@ function startMenu(){
 	startText.x = gamewidth/2;
 	startText.y = 155;
 	stage.addChild(startText);
-	var startText2 = new Text("press any key to continue", "10px Arial", "#EEF");
+	var startText2 = new Text("press any key to start", "10px Arial", "#EEF");
 	startText2.textAlign = "center";
 	startText2.x = gamewidth/2;
 	startText2.y = 400;
@@ -147,19 +152,19 @@ function startLevel(){
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
 	objectives = [Base(Math.random()*gamewidth, Math.random()*gameheight, 30),Base(Math.random()*gamewidth, Math.random()*gameheight, 30),Objective(Math.random()*gamewidth, Math.random()*gameheight, 70)];
-	ene = Enemy(150,150,stage, 1);
-	ene1 = Enemy(130,150,stage, 1);
-	ene2 = Enemy(150,130,stage, 1);
-	ene3 = Enemy(180,150,stage, 1);
-	ene4 = Enemy(150,180,stage, 1);
-	/*player1 = new Player("Player 1", gamewidth/2-100, 60,"40,180,250", stage);
-	player1.vspeed = 0;*/
-	player2 = new Player("Player 2",2, gamewidth/2+100, 60+200,"250,180,40", stage);
-	player3 = new Player("Player 2",2, gamewidth/2+150, 60+200,"250,180,40", stage);
-	//player1 = ene;
+	ene = Enemy(100,gameheight/2,stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene1 = Enemy(ene.x+50,ene.y,stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene2 = Enemy(ene.x-50,ene.y,stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene3 = Enemy(ene.x,ene.y+50,stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene4 = Enemy(ene.x,ene.y-50,stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	pl = new Player("Player 2",2, gamewidth-100, gameheight/2,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
+	pl2 = new Player("Player 2",2, pl.x+50, pl.y,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
+	pl3 = new Player("Player 2",2, pl.x-50, pl.y,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
+	pl4 = new Player("Player 2",2, pl.x, pl.y+50,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
+	pl5 = new Player("Player 2",2, pl.x, pl.y-50,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
 	ene.assumeControl();
-	player2.assumeControl();
-	players = [player2,player3,ene,ene1,ene2,ene3,ene4];
+	pl.assumeControl();
+	players = [pl,pl2,pl3,pl4,pl5,ene,ene1,ene2,ene3,ene4];
 	
 	
 	platformFirstSpawn();
@@ -168,23 +173,54 @@ function startLevel(){
 	scoreText1.x = 10;
 	scoreText1.y = 5;
 	scoreText2 = new Text("SCORE: ", "17px impact", "#AFF");
-	scoreText2.x = gamewidth - 140;
+	scoreText2.x = gamewidth - 240;
 	scoreText2.y = 5;
+	
+	reinfText1 = new Text("REINFORCE: ", "17px impact", "#AFF");
+	reinfText1.x = 100;
+	reinfText1.y = 5;
+	reinfText2 = new Text("REINFORCE: ", "17px impact", "#AFF");
+	reinfText2.x = gamewidth - 150;
+	reinfText2.y = 5;
+	
 	energyText1 = new Text("ENERGY: ", "12px impact", "#AFF");
 	energyText1.x = 10;
 	energyText1.y = 25;
 	energyText2 = new Text("ENERGY: ", "12px impact", "#AFF");
-	energyText2.x = gamewidth - 140;
+	energyText2.x = gamewidth - 240;
 	energyText2.y = 25;
+	
 	hpText1 = new Text("HP: ", "12px impact", "#AFF");
 	hpText1.x = 10;
 	hpText1.y = 40;
 	hpText2 = new Text("HP: ", "12px impact", "#AFF");
-	hpText2.x = gamewidth - 140;
+	hpText2.x = gamewidth - 240;
 	hpText2.y = 40;
+	
+	hText1 = new Text("H: ", "12px impact", "#AFF");
+	hText1.x = 90;
+	hText1.y = 25;
+	hText2 = new Text("H: ", "12px impact", "#AFF");
+	hText2.x = gamewidth - 160;
+	hText2.y = 25;
+	
+	eText1 = new Text("E: ", "12px impact", "#AFF");
+	eText1.x = 90;
+	eText1.y = 40;
+	eText2 = new Text("E: ", "12px impact", "#AFF");
+	eText2.x = gamewidth - 160;
+	eText2.y = 40;
+	
+	dText1 = new Text("D: ", "12px impact", "#AFF");
+	dText1.x = 130;
+	dText1.y = 25;
+	dText2 = new Text("D: ", "12px impact", "#AFF");
+	dText2.x = gamewidth - 120;
+	dText2.y = 25;
+	
 	scoreBack = new Shape();
-	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,150,60,0,0,20,0).drawRoundRectComplex(gamewidth-150,0,150,60,0,0,0,20)//.rect(0,0,150,30);
-	gui.addChild(scoreBack, scoreText1, scoreText2, energyText1, energyText2,hpText1,hpText2);		
+	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,250,60,0,0,20,0).drawRoundRectComplex(gamewidth-250,0,250,60,0,0,0,20)//.rect(0,0,150,30);
+	gui.addChild(scoreBack, scoreText1, scoreText2, reinfText1, reinfText2, energyText1, energyText2,hpText1,hpText2,hText1,hText2,eText1,eText2,dText1,dText2);		
 	stage.addChild(gui);
 	//Box(gamewidth/2-20,80,60,15,stage,"up");
 	
@@ -196,15 +232,23 @@ function tick(){
 	diff += 0.0002;
 	scoreText1.text = "SCORE1: " + score1;
 	scoreText2.text = "SCORE2: " + score2;
-	energyText1.text = "ENERGY: " + player1.energy;
-	energyText2.text = "ENERGY: " + player2.energy;
-	hpText1.text = "HP: " + player1.hp;
-	hpText2.text = "HP: " + player2.hp;
+	energyText1.text = "ENERGY: " + Math.round(player1.energy);
+	energyText2.text = "ENERGY: " + Math.round(player2.energy);
+	reinfText1.text = "REINFORCE: " + Math.round(res1/5)+"%";
+	reinfText2.text = "REINFORCE: " + Math.round(res2/5)+"%";
+	hpText1.text = "HP: " + Math.round(player1.hp);
+	hpText2.text = "HP: " + Math.round(player2.hp);
 	hpText1.color = player1.hp<60?player1.hp<30?"#F44":"#FAA":"#AFF"
 	hpText2.color = player2.hp<60?player2.hp<30?"#F44":"#FAA":"#AFF"
+	hText1.text = "H: " + Math.round(stats1.hp);
+	hText2.text = "H: " + Math.round(stats2.hp);
+	eText1.text = "E: " + Math.round(stats1.energy);
+	eText2.text = "E: " + Math.round(stats2.energy);
+	dText1.text = "D: " + Math.round(stats1.damage);
+	dText2.text = "D: " + Math.round(stats2.damage);
 	stage.setChildIndex(gui,0);
 	
-	console.log(player2.vspeed, ((player2.left || player2.right)&&(player2.down || player2.up)));
+	//console.log(player2.vspeed, ((player2.left || player2.right)&&(player2.down || player2.up)));
 	
 	for(i in boxes){
 		var box = boxes[i];
@@ -249,11 +293,11 @@ function tick(){
 	}	
 	if(res1 >= 500){
 		res1-=500;
-		players.push(Enemy(0,gameheight/2,stage, 1));
+		players.push(Enemy(0,gameheight/2,stage, 1, stats1.hp,stats1.damage,stats1.energy));
 	}
 	if(res2 >= 500){
 		res2-=500;
-		players.push(Player("Player 2",2, gamewidth, gameheight/2,"250,180,40", stage));
+		players.push(Player("Player 2",2, gamewidth, gameheight/2,"250,180,40", stage, stats2.hp,stats2.damage,stats2.energy));
 	}
 	for(i in objectives){
 		var o = objectives[i];
@@ -262,13 +306,27 @@ function tick(){
 	stage.update();
 }
 
+function updateStats(){
+	for(var i in players){
+		var p = players[i];
+		var stats;
+		if(p.side == 1){stats = stats1;}
+		else {stats = stats2};
+		p.maxhp = stats.hp;
+		p.damage = stats.damage;
+		p.energy = stats.energy;
+		
+	}
+}
+
+
 function platformFirstSpawn(){
 	var x,y,w,h;
 	for(var i=0; i<20; i++){
-		h = Math.round(Math.random()*80+8);
-		w = Math.round(Math.random()*80+8);
-		x = Math.round(Math.random()*gamewidth-w);
-		y = Math.round(Math.random()*(gameheight-80-h)+80);
+		h = Math.round(Math.round(Math.random()*8)*10+10);
+		w = Math.round(Math.round(Math.random()*8)*10+10);
+		x = Math.round(Math.round(Math.random()*gamewidth/10)*10-w);
+		y = Math.round(Math.round((Math.random()*(gameheight-80-h))/10)*10+80);
 		Box(x,y,w,h, stage, 0);
 	}
 }

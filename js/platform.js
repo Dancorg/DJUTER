@@ -50,14 +50,14 @@ function Base(x,y,r){
 			dp[1] = pointDistanceSquared(this.x, this.y, player2.x, player2.y);
 			if(dp[0] <= this.s*this.s){
 				var val = 10*Math.round(Math.sqrt(this.s*this.s - dp[0]))/side1;
-				console.log(val);
+				//console.log(val);
 				res1 += val;
 				this.resources -= val;
 			}
 			
 			if(dp[1] <= this.s*this.s){
 				var val = 10*Math.round(Math.sqrt(this.s*this.s - dp[1]))/side2;
-				console.log(val);
+				//console.log(val);
 				res2 += val;
 				this.resources -= val;
 			}
@@ -97,7 +97,7 @@ function Objective(x,y,r){
 	shape.score = 50;
 	stage.addChild(shape);
 	shape.relocate = function(){
-		this.x = Math.random()*gamewidth;
+		this.x = gamewidth/4+Math.random()*gamewidth/2;
 		this.y = Math.random()*gameheight;
 		this.score = 50;
 	}
@@ -112,10 +112,18 @@ function Objective(x,y,r){
 					if(p.side == 1){
 						score1++;
 						this.score--;
+						stats1.hp+=0.5;
+						stats1.energy+=0.2;
+						stats1.damage+=0.1;
+						updateStats();
 					}
 					if(p.side == 2){
 						score2++;
 						this.score--;
+						stats2.hp+=0.5;
+						stats2.energy+=0.2;
+						stats2.damage+=0.1;
+						updateStats();
 					}
 				}
 			}

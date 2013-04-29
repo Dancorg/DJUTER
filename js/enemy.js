@@ -1,4 +1,4 @@
-function Enemy(x, y, stage, side){
+function Enemy(x, y, stage, side,hp,damage,energy){
 	var shape = new Shape();
 	var s = 10;	
 	shape.controlled = false;
@@ -14,18 +14,22 @@ function Enemy(x, y, stage, side){
 	shape.melee = true;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 3;
-	shape.hp = 100;
+	shape.hp = hp;
+	shape.maxhp = hp;
 	shape.left = 0;
 	shape.right = 0;
 	shape.up = 0;
 	shape.down = 0;
 	shape.energy = 0;
-	shape.maxenergy = 100;	
+	shape.maxenergy = energy;
+	shape.damage = damage;
 	shape.attack = false;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.vspeed = 0;
 	shape.hspeed = 0;
+	shape.speedfactor = 1;
+	shape.acelfactor = 1;
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*120)-60;
 	shape.formy = Math.round(Math.random()*120)-60;

@@ -1,4 +1,4 @@
-function Player(name, side, x, y, color, stage){
+function Player(name, side, x, y, color, stage,hp,damage,energy){
 	var shape = new Shape();
 	var s = 10;
 	shape.controlled = false;
@@ -14,20 +14,24 @@ function Player(name, side, x, y, color, stage){
 	shape.melee = false;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 2;
-	shape.hp = 100;
+	shape.hp = hp;
+	shape.maxhp = hp;
 	shape.left = 0;
 	shape.right = 0;
 	shape.up = 0;
 	shape.down = 0;
 	shape.energy = 0;
 	shape.firerate = 5;
-	shape.maxenergy = 100;
+	shape.maxenergy = energy;
+	shape.damage = damage;
 	shape.attack = false;
 	shape.angle = 0;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.vspeed = 0;
 	shape.hspeed = 0;
+	shape.speedfactor = 1;
+	shape.acelfactor = 1;
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*60);
 	shape.formy = Math.round(Math.random()*60);
@@ -80,7 +84,7 @@ var playerDeath = function(j){
 var playerUpdate = function(j){
 	this.ai();
 	if(this.isAlive){
-		if(maincounter%3==0 && this.controlled){
+		if(maincounter%3==0 && this.controlled && (Math.abs(this.hspeed)+Math.abs(this.vspeed)>0.5)){
 			Particle(this.x+5,this.y+5,5,0,0,this.color,stage, false, 50);}
 		if(/*!this.attack &&*/ this.energy < this.maxenergy)this.energy++;
 		
@@ -88,51 +92,61 @@ var playerUpdate = function(j){
 			b = boxes[i];	
 			preciseColllision(this, b);
 		}
-		
-		if(this.x+this.s<0 || this.x-this.s>gamewidth || this.y+this.s<0 || this.y-this.s>gameheight)
-			this.death(j);
+	
 		this.y += this.vspeed;
 		this.x += this.hspeed;
+		if(this.x<0)this.x = 0; 
+		if(this.x+this.s>gamewidth) this.x = gamewidth-this.s;
+		if(this.y<0)this.y=0;
+		if(this.y+this.s>gameheight)this.y = gameheight-this.s;
+			
 		if(this.halo){
 			//this.halo.graphics.clear().setStrokeStyle(2, "round").beginStroke(shape.color).drawCircle(0,0,50);
-			this.halo.alpha = this.hp/100;
+			this.halo.alpha = this.hp/this.maxhp;
 			this.halo.x = this.x;
 			this.halo.y = this.y;
 		}
-		var diagonal = ((this.left || this.right)&&(this.down || this.up))?0.71:1;
+		var diagonal = ((this.left || this.right)&&(this.down || this.up))?0.84:1;
+		var totalmaxspeed = this.maxspeed*diagonal*this.speedfactor;
+		this.acelfactor = 1; //reset factor
+		this.speedfactor = 1; //reset factor
+		var totalacel = 0.5*diagonal*this.acelfactor;
 		
-		if(this.left && this.hspeed>-this.maxspeed*diagonal)this.hspeed -= 0.5*diagonal;
-		if(this.right  && this.hspeed<this.maxspeed*diagonal)this.hspeed += 0.5*diagonal;
-		if(this.up && this.vspeed>-this.maxspeed*diagonal)this.vspeed -= 0.5*diagonal;
-		if(this.down  && this.vspeed<this.maxspeed*diagonal)this.vspeed += 0.5*diagonal;
-		if(this.hspeed>this.maxspeed*diagonal)this.hspeed = this.maxspeed*diagonal;
-		if(this.hspeed<-this.maxspeed*diagonal)this.hspeed = -this.maxspeed*diagonal;
-		if(this.vspeed>this.maxspeed*diagonal)this.vspeed = this.maxspeed*diagonal;
-		if(this.vspeed<-this.maxspeed*diagonal)this.vspeed = -this.maxspeed*diagonal;
-		if(!(this.left || this.right) ) this.hspeed/=2;
-		if(!(this.up || this.down) ) this.vspeed/=2;
+		if(this.left && this.hspeed>-totalmaxspeed)this.hspeed -= totalacel;
+		if(this.right  && this.hspeed<totalmaxspeed)this.hspeed += totalacel;
+		if(this.up && this.vspeed>-totalmaxspeed)this.vspeed -= totalacel;
+		if(this.down  && this.vspeed<totalmaxspeed)this.vspeed += totalacel;
+		if(this.hspeed>totalmaxspeed*diagonal)this.hspeed = totalmaxspeed*diagonal;
+		if(this.hspeed<-totalmaxspeed*diagonal)this.hspeed = -totalmaxspeed*diagonal;
+		if(this.vspeed>totalmaxspeed*diagonal)this.vspeed = totalmaxspeed*diagonal;
+		if(this.vspeed<-totalmaxspeed*diagonal)this.vspeed = -totalmaxspeed*diagonal;
+		if(!(this.left || this.right) ) this.hspeed/=1.2;
+		if(!(this.up || this.down) ) this.vspeed/=1.2;
 
 		this.other = null;
+		var pass = true;;
 		for(i in players ){
 			b = players[i];
-			if(b != this)playerColllision(this, b);
+			if(this.side == 1){if(b == player1)pass=false;else pass=true};
+			if(this.side == 2){if(b == player2)pass=false;else pass=true};
+			if(b != this && pass)playerColllision(this, b);
 		}
-		if(!this.melee && this.attack && this.energy>=10 && maincounter%this.firerate==0){
-			this.energy -= 10;
+		if(!this.melee && this.attack && this.energy>=20 && maincounter%this.firerate==0){
+			this.energy -= 20;
 			var hspeed = Math.cos(this.angle)*20;
 			var vspeed = Math.sin(this.angle)*20;
-			Projectile(this,this.x+this.s/2,this.y+this.s/2,20,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,10,stage);
+			Projectile(this,this.x+this.s/2,this.y+this.s/2,this.damage,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,10,stage);
 		}
 		//if(this == player1)console.log(this.attack);
 		if(this.melee){
-			if(this.attack && this.energy >= 60){
-				if(this == player1)console.log("melee attack");
-				this.energy -= 60;
-				this.vspeed *= 4;
-				this.hspeed *= 4;
+			if(this.attack && this.energy >= 5){
+				this.energy -= 5;
+				this.acelfactor = 20;
+				this.speedfactor = 3;
+				if(this == player1)console.log(this.acelfactor, "melee attack");
 			}
 			if(this.other && this.other.side != this.side){
-				this.other.hp -= 15;
+				this.other.hp -= this.damage;
 			}
 		}
 		//else if(this.energy<=10)this.attack = false;
@@ -167,7 +181,7 @@ var aiSUpdate = function(){
 			}
 		}
 	}
-	if(this.target && !collisionLine(this,this.target,boxes) && dis<20000){
+	if(this.target && !collisionLine(this,this.target,boxes) && dis<30000){
 		this.angle = Math.atan2(this.target.y-this.y,this.target.x-this.x);
 		this.attack = true;
 	}
