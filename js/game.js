@@ -399,19 +399,27 @@ function preciseColllision(player, b){
 	if(boxCollision(player, b,1,1)){
 		if(py<b.y){
 			if(player.vspeed > 0)
-				player.vspeed = 0;
+				player.vspeed = 0
+				//player.y-=0.1;
+				player.y = b.y-player.s;
 		}
 		if(px+player.s*0.5<b.x){ 
 			if(player.hspeed > 0)
 				player.hspeed = 0;
+				//player.x-=0.1;
+				player.x = b.x-player.s;
 		}
 		if(px+player.s*0.5>b.x+b.w){
 			if(player.hspeed < 0)
 				player.hspeed = 0;
+				//player.x+=0.1;
+				player.x = b.x +b.w;
 		}
 		else if(py+player.s>b.y+b.h){
 			if(player.vspeed < 0)
 				player.vspeed = 0;
+				//player.y+=0.1;
+				player.y = b.y +b.h;
 		}
 	}
 }

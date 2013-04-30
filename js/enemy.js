@@ -99,6 +99,8 @@ function assumeControl(){
 	this.left = this.right = this.up = this.down = false;
 	if(this.side == 1)player1 = this;
 	if(this.side == 2)player2 = this;
+	//if(this.side == 1){this.ai = aistratZUpdate;}//commander AI
+	if(this.side == 2){this.ai = aistratSUpdate;}//commander AI
 }
 
 function abandonControl(){
