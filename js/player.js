@@ -28,6 +28,7 @@ function Player(name, side, x, y, color, stage,hp,damage,energy){
 	shape.angle = 0;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
+	shape.snapToPixel = true;
 	shape.vspeed = 0;
 	shape.hspeed = 0;
 	shape.speedfactor = 1;
@@ -124,7 +125,7 @@ var playerUpdate = function(j){
 			this.energy -= 20;
 			var hspeed = Math.cos(this.angle)*20;
 			var vspeed = Math.sin(this.angle)*20;
-			Projectile(this,this.x+this.s/2,this.y+this.s/2,this.damage,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,10,stage);
+			Projectile(this,this.x+this.s/2,this.y+this.s/2,this.damage,hspeed,vspeed,radToDeg(this.angle),20,0.95,"rgba(250,250,0,1)",3,60,stage);
 		}
 		//if(this == player1)console.log(this.attack);
 		if(this.melee){

@@ -26,6 +26,7 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.attack = false;
 	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
+	shape.snapToPixel = true;
 	shape.vspeed = 0;
 	shape.hspeed = 0;
 	shape.speedfactor = 1;

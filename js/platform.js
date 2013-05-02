@@ -13,6 +13,7 @@ function Box(x, y, w, h, stage, speed){
 	shape.speed = speed;
 	shape.snapToPixel = true;
 	shape.cache(0,0,w,h);
+	shape.snapToPixel = true;
 	stage.addChild(shape);
 	boxes.push(shape);
 

@@ -67,14 +67,17 @@ function Coin(x,y,stage){
 
 function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,size2,stage){
 	shape = new Shape();
-	shape.graphics.setStrokeStyle(size1,"butt").beginStroke(color).moveTo(0,0).lineTo(size2,0);
+	//shape.graphics.setStrokeStyle(size1,"butt").beginStroke(color).moveTo(0,0).lineTo(size2,0);
+	shape.graphics.setStrokeStyle(size1,"butt").beginLinearGradientStroke(['rgba(0,0,0,0)',color],[0,0.4],0,0,size2,0).moveTo(0,0).lineTo(size2,0);
 	shape.x = x;
 	shape.y = y;
+	shape.size = size2;
 	shape.color = color;
 	shape.rotation = angle;
 	shape.drop = drop;
 	shape.time = time;
 	shape.cache(-size2*1,-size1*1,size2*2,size1*2);
+	shape.snapToPixel = true;
 	shape.damage = damage;
 	shape.hspeed = hspeed;
 	shape.vspeed = vspeed;

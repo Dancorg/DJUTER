@@ -135,7 +135,7 @@ function startMenu(){
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
 	var startBox = new Shape();
-	startBox.graphics.beginFill('rgba(220,180,50,1)').rect(0,-8,gamewidth,86).beginFill('rgba(150,20,20,0.9)').rect(0,0,gamewidth,70);
+	startBox.graphics.beginFill('rgba(10,10,10,0.5)').rect(0,15,gamewidth,86).beginFill('rgba(220,180,50,1)').rect(0,-8,gamewidth,86).beginFill('rgba(150,20,20,0.9)').rect(0,0,gamewidth,70);
 	startBox.x=0;
 	startBox.y=150;
 	stage.addChild(startBox);
@@ -168,7 +168,7 @@ function menuScreen(){
 	side1ai.y = 60;
 	
 	var button1 = new Shape();
-	button1.graphics.beginFill("rgba(10,150,250,0.75)").rect(0,50,150,45);
+	button1.graphics.beginFill("rgba(10,10,10,0.25)").rect(10,60,150,45).beginFill("rgba(10,150,250,0.75)").rect(0,50,150,45);
 	button1.addEventListener("click",function(e){
 		if(ai1 == false){
 			ai1=true;
@@ -186,7 +186,7 @@ function menuScreen(){
 	side2ai.y = 160;
 	
 	var button2 = new Shape();
-	button2.graphics.beginFill("rgba(10,150,250,0.75)").rect(0,150,150,45);
+	button2.graphics.beginFill("rgba(10,10,10,0.25)").rect(10,160,150,45).beginFill("rgba(10,150,250,0.75)").rect(0,150,150,45);
 	button2.addEventListener("click",function(e){
 		if(ai2 == false){
 			ai2=true;
@@ -204,7 +204,7 @@ function menuScreen(){
 	startText.y = 265;
 	
 	var startbutton = new Shape();
-	startbutton.graphics.beginFill("rgba(10,150,250,0.75)").rect(0,250,150,65);
+	startbutton.graphics.beginFill("rgba(10,10,10,0.25)").rect(10,260,150,65).beginFill("rgba(10,150,250,0.75)").rect(0,250,150,65);
 	startbutton.addEventListener("click",function(e){
 		startLevel();
 	});
