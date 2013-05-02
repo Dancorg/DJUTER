@@ -8,7 +8,7 @@ WASD movement
 SPACEBAR sprint
 
 Player 2 controls the yellow soldiers:
-ARROWS moveent
+ARROWS movement
 MOUSE aim and shoot
 
 Both zombie sprint and soldier attack consumes energy
