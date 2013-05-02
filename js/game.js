@@ -10,6 +10,9 @@ var particles;
 var coins;
 var objectives;
 
+var ai1,ai2;
+var c1,c2;
+
 var stats1;
 var stats2;
 
@@ -30,6 +33,7 @@ var left = 0;
 var right = 0;
 var jump = 0;
 var gui;
+var ingame = false;
 var startButton = false;
 var endButton = true;
 var diff;
@@ -53,6 +57,7 @@ document.onkeydown = handleKeyDown;
 document.onkeyup = handleKeyUp;
 
 function reset(){
+	endButton = true;
 	stage.removeAllChildren();
 	boxes = [];
 	players = [];
@@ -63,6 +68,8 @@ function reset(){
 	score2 = 0;
 	res1 = 0;
 	res2 = 0;
+	c1 = 0;
+	c2 = 0;
 	boxSpawn = 0;
 	diff = 0;
 	endtimer = -1;
@@ -121,6 +128,7 @@ function init(){
 
 function startMenu(){
 	reset();
+	ingame = false;
 	Ticker.setPaused(true);
 	var background = new Shape();
 	background.graphics.beginRadialGradientFill(["#080822","#248"],[0.99,0.01],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
@@ -144,14 +152,75 @@ function startMenu(){
 	stage.update();	
 }
 
-function startLevel(){
+function menuScreen(){
 	reset();
-	Ticker.setPaused(false);
+	ingame = false;
+	stage.removeAllChildren();
+	stage.update();
+	ai1 = ai2 = false;
 	var background = new Shape();
-	background.graphics.beginRadialGradientFill(["#112","#27B"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
+	background.graphics.beginRadialGradientFill(["#080822","#248"],[0.99,0.01],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
-	objectives = [Base(Math.random()*gamewidth, Math.random()*gameheight, 30),Base(Math.random()*gamewidth, Math.random()*gameheight, 30),Objective(Math.random()*gamewidth, Math.random()*gameheight, 70)];
+	
+	var side1ai = new Text("PLAYER 1: HUMAN", "17px impact", "#AFF");
+	side1ai.x = 10;
+	side1ai.y = 60;
+	
+	var button1 = new Shape();
+	button1.graphics.beginFill("rgba(10,150,250,0.75)").rect(0,50,150,45);
+	button1.addEventListener("click",function(e){
+		if(ai1 == false){
+			ai1=true;
+			side1ai.text = "PLAYER 1: AI";
+		}
+		else {
+			ai1 = false;
+			side1ai.text = "PLAYER 1: HUMAN";
+		}
+		stage.update();
+	});
+	
+	var side2ai = new Text("PLAYER 2: HUMAN", "17px impact", "#AFF");
+	side2ai.x = 10;
+	side2ai.y = 160;
+	
+	var button2 = new Shape();
+	button2.graphics.beginFill("rgba(10,150,250,0.75)").rect(0,150,150,45);
+	button2.addEventListener("click",function(e){
+		if(ai2 == false){
+			ai2=true;
+			side2ai.text = "PLAYER 2: AI";
+		}
+		else {
+			ai2 = false;
+			side2ai.text = "PLAYER 2: HUMAN";
+		}
+		stage.update();
+	});
+	
+	var startText = new Text("PLAAAAAAAAAY", "21px impact", "#AFF");
+	startText.x = 10;
+	startText.y = 265;
+	
+	var startbutton = new Shape();
+	startbutton.graphics.beginFill("rgba(10,150,250,0.75)").rect(0,250,150,65);
+	startbutton.addEventListener("click",function(e){
+		startLevel();
+	});
+	stage.addChild(button1,button2,side1ai,side2ai,startbutton,startText);
+	stage.update();
+}
+
+function startLevel(){
+	reset();
+	ingame = true;
+	Ticker.setPaused(false);
+	var background = new Shape();
+	background.graphics.beginRadialGradientFill(["#080822","#248"],[0.1,0.9],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
+	background.cache(0,0,gamewidth,gameheight);
+	stage.addChild(background);
+	objectives = [Base(Math.random()*gamewidth/2, Math.random()*gameheight, 30),Base(Math.random()*gamewidth/2+gamewidth/2, Math.random()*gameheight, 30),Objective(gamewidth/4+Math.random()*gamewidth/2, Math.random()*gameheight, 70)];
 	ene = Enemy(100,gameheight/2,stage, 1,stats1.hp,stats1.damage,stats1.energy);
 	ene1 = Enemy(ene.x+50,ene.y,stage, 1,stats1.hp,stats1.damage,stats1.energy);
 	ene2 = Enemy(ene.x-50,ene.y,stage, 1,stats1.hp,stats1.damage,stats1.energy);
@@ -164,6 +233,7 @@ function startLevel(){
 	pl5 = new Player("Player 2",2, pl.x, pl.y-50,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
 	ene.assumeControl();
 	pl.assumeControl();
+	c1 = c2 = 5;
 	players = [pl,pl2,pl3,pl4,pl5,ene,ene1,ene2,ene3,ene4];
 	
 	
@@ -250,6 +320,11 @@ function tick(){
 	
 	//console.log(player2.vspeed, ((player2.left || player2.right)&&(player2.down || player2.up)));
 	
+	/*c1 = c2 = 0;
+	for(var i in players){
+		if(players[i].side == 1)c1++; else c2++;
+	}*/
+	
 	for(i in boxes){
 		var box = boxes[i];
 		box.y+=box.speed; //move the box
@@ -293,16 +368,21 @@ function tick(){
 	}	
 	if(res1 >= 500){
 		res1-=500;
+		c1++;
 		players.push(Enemy(0,gameheight/2,stage, 1, stats1.hp,stats1.damage,stats1.energy));
+		//players.push(Player("Player 1",1, 0, gameheight/2,"220,50,80", stage, stats1.hp,stats1.damage,stats1.energy));
 	}
 	if(res2 >= 500){
 		res2-=500;
+		c2++;
 		players.push(Player("Player 2",2, gamewidth, gameheight/2,"250,180,40", stage, stats2.hp,stats2.damage,stats2.energy));
+		//players.push(Enemy(gamewidth,gameheight/2,stage, 2, stats2.hp,stats2.damage,stats2.energy));
 	}
 	for(i in objectives){
 		var o = objectives[i];
 		o.update();
 	}
+	if(endButton && (c1==0 || c2==0))endRound();
 	stage.update();
 }
 
@@ -432,19 +512,22 @@ function radToDeg(rad){
 	return rad / (Math.PI/180);
 }
 
-function death(){//player dies, score screen displayed
-	player1.isAlive = false;
-	endtimer = 30;
-	stage.removeChild(player1);
-	for(var i=0;i<10;i++){
-		Particle(player1.x+i,player1.y+Math.random()*10,10,Math.random()*20-10,Math.random()*30-15,'rgba(180,40,40,1)',stage, false, 120);
-	}
+function endRound(){
+	endtimer = 60;
+	var deathText = new Text("", "30px Impact", "#FFF");
+	if(c1 == 0)deathText.text="PLAYER 2 WINS";
+	if(c2 == 0)deathText.text="PLAYER 1 WINS";
+	if(c1 == 0 && c2==0)deathText.text="DRAW";	
+	deathText.textAlign = "center";
+	deathText.x = gamewidth/2;
+	deathText.y = 156;
 	
 	var deathBox = new Shape();
 	deathBox.graphics.beginFill('rgba(200,50,50,0.1)').rect(0,-20,gamewidth,90).beginFill('rgba(10,10,10,0.8)').rect(0,-3,gamewidth,56).beginFill('rgba(200,50,50,0.7)').rect(0,0,gamewidth,50);
 	deathBox.x = 0;
 	deathBox.y = 150;
 	gui.addChild(deathBox);
+	gui.addChild(deathText);
 	stage.update();
 	endButton = false;
 }

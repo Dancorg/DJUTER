@@ -1,8 +1,8 @@
 var aistratZUpdate = function(){
-	var c1 = c2 = 0;
+	/*var c1 = c2 = 0;
 	for(var i in players){
 		if(players[i].side == 1)c1++; else c2++;
-	}
+	}*/
 	if(this.target)
 		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
 	if(this.target && dis<22500){
@@ -71,10 +71,10 @@ var aistratZUpdate = function(){
 }
 
 var aistratSUpdate = function(){
-	var c1 = c2 = 0;
+	/*var c1 = c2 = 0;
 	for(var i in players){
 		if(players[i].side == 1)c1++; else c2++;
-	}
+	}*/
 	if(this.target)
 		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
 	if(this.target && dis<12500){

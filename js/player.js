@@ -66,19 +66,8 @@ var playerDeath = function(j){
 			Particle(this.x+i,this.y+Math.random()*10,6,Math.random()*20-10,Math.random()*20-10,'rgba(180,40,40,1)',stage, false, 40);
 		}
 		players.splice(j,1);
-		
-		/*var deathBox = new Shape();
-		deathBox.graphics.beginFill('rgba(200,50,50,0.1)').rect(0,-20,gamewidth,90).beginFill('rgba(10,10,10,0.8)').rect(0,-3,gamewidth,56).beginFill('rgba(200,50,50,0.7)').rect(0,0,gamewidth,50);
-		deathBox.x=0;
-		deathBox.y=150;
-		gui.addChild(deathBox);
-		var deathText = new Text(this.name + " has daid: ", "30px Impact", "#FFF");
-		deathText.textAlign = "center";
-		deathText.x = gamewidth/2;
-		deathText.y = 156;
-		gui.addChild(deathText);
-		stage.update();
-		endButton = false;*/
+		if(this.side == 1)c1--;
+		else c2--;
 }
 
 var playerUpdate = function(j){

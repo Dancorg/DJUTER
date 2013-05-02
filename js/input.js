@@ -2,11 +2,13 @@
 function handleKeyDown(e){
 	if(!startButton){
 		startButton = true;
-		startLevel();
+		menuScreen();
+		//startLevel();
 	}
+	if(!ingame)return;
 	if(!endButton && endtimer == 0){
 		endButton = true;
-		startLevel();
+		menuScreen();
 		/*startButton = false;
 		startMenu();*/
 	}
@@ -36,6 +38,7 @@ function handleKeyDown(e){
 }
 
 function handleKeyUp(e){
+	if(!ingame)return;
 	switch(e.keyCode){
 		case keyup:
 			player2.up = false;return false;
@@ -107,6 +110,7 @@ function handleTouchEnd(e){
 
 //COPY OF KEYBOARD EVENTS, UPDATE IF KEYBOARD EVENTS CHANGE
 function handleMouseDown(e){
+	if(!ingame)return;
 	var mX = e.clientX - canvas.offsetLeft;
 	var mY = e.clientY - canvas.offsetTop;
 	if(player2){
@@ -129,6 +133,7 @@ function handleMouseMove(e){
 }
 
 function handleMouseUp(e){
+	if(!ingame)return;
 	player2.attack = false;
 	/*if(e.clientX  <200+canvasx)left = false;
 	if((e.clientX  >=200+canvasx && e.clientX  <=440+canvasx) || e.clientY<300+canvasY){
