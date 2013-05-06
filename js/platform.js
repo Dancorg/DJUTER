@@ -29,16 +29,16 @@ function Base(x,y,r){
 	shape.y = y;
 	shape.s = r;
 	shape.timers = [0, 0];
-	shape.resources = 10000;
+	shape.resources = 3000;
 	stage.addChild(shape);
 	shape.relocate = function(){
 		this.x = Math.random()*gamewidth;
 		this.y = Math.random()*gameheight;
-		this.resources = 10000;
+		this.resources = 3000;
 	}
 	shape.update = function(){
 		this.timers[0] --;
-		this.alpha = this.resources/10000;
+		this.alpha = this.resources/3000;
 		if(this.resources>0 && this.timers[0] == 0){
 			var side1 = side2 = 0;
 			for(i in players){
@@ -114,16 +114,16 @@ function Objective(x,y,r){
 						score1++;
 						this.score--;
 						stats1.hp+=0.5;
-						stats1.energy+=0.2;
-						stats1.damage+=0.1;
+						stats1.energy+=0.3;
+						stats1.damage+=0.2;
 						updateStats();
 					}
 					if(p.side == 2){
 						score2++;
 						this.score--;
 						stats2.hp+=0.5;
-						stats2.energy+=0.2;
-						stats2.damage+=0.1;
+						stats2.energy+=0.3;
+						stats2.damage+=0.2;
 						updateStats();
 					}
 				}

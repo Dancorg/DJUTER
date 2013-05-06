@@ -9,6 +9,8 @@ var boxes;
 var particles;
 var coins;
 var objectives;
+var quadP;
+var quadB;
 
 var ai1,ai2;
 var c1,c2;
@@ -239,6 +241,9 @@ function startLevel(){
 	
 	platformFirstSpawn();
 	gui = new Container();
+	quadP = Quadtree(0,[0,0,gamewidth,gameheight]);
+	quadB = Quadtree(0,[0,0,gamewidth,gameheight]);
+	
 	scoreText1 = new Text("SCORE: ", "17px impact", "#AFF");
 	scoreText1.x = 10;
 	scoreText1.y = 5;
@@ -317,6 +322,15 @@ function tick(){
 	dText1.text = "D: " + Math.round(stats1.damage);
 	dText2.text = "D: " + Math.round(stats2.damage);
 	stage.setChildIndex(gui,0);
+	
+	quadP.clear();
+	quadB.clear();
+	for(var i in boxes){
+		quadB.insert(boxes[i]);
+	}
+	for(var i in players){
+		quadP.insert(players[i]);
+	}
 	
 	//console.log(player2.vspeed, ((player2.left || player2.right)&&(player2.down || player2.up)));
 	

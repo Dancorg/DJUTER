@@ -71,6 +71,8 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 	shape.graphics.setStrokeStyle(size1,"butt").beginLinearGradientStroke(['rgba(0,0,0,0)',color],[0,0.4],0,0,size2,0).moveTo(0,0).lineTo(size2,0);
 	shape.x = x;
 	shape.y = y;
+	shape.h = 1; // only for quadtree compatibility
+	shape.w = 1; // only for quadtree compatibility
 	shape.size = size2;
 	shape.color = color;
 	shape.rotation = angle;
@@ -81,6 +83,7 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 	shape.damage = damage;
 	shape.hspeed = hspeed;
 	shape.vspeed = vspeed;
+	shape.impulse = .125;
 	shape.owner = owner;
 	shape.side = owner.side;
 	stage.addChild(shape);
@@ -91,16 +94,20 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 			this.death(i,"quiet");
 			return true;
 		}
+		var players = [];
+		players = quadP.retrieve(this);
 		for(j in players){
 			var p = players[j];
 			if(p.side != this.side && collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,p,"cross")){
-				p.hspeed+=this.hspeed/8;
-				p.vspeed+=this.vspeed/8;
+				p.hspeed+=this.hspeed*this.impulse;
+				p.vspeed+=this.vspeed*this.impulse;
 				p.hp-=this.damage;
 				this.death(i,"explosive");
 				return true;
 			}
 		}
+		var boxes = [];
+		boxes = quadB.retrieve(this);
 		for(j in boxes){
 			var box = boxes[j];
 			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box,"box")){
