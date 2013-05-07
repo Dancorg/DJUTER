@@ -16,7 +16,15 @@ function Box(x, y, w, h, stage, speed){
 	shape.snapToPixel = true;
 	stage.addChild(shape);
 	boxes.push(shape);
-
+	/*boxes.divide = function(){
+		var divx = this.w/10;
+		var divy = this.h/10;
+		for(var i in divx){
+			for(var j in divy){
+				
+			}
+		}
+	};*/
 }
 
 function Base(x,y,r){

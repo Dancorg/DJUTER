@@ -113,7 +113,7 @@ function switchFullscreen(){
 
 
 function init(){
-	
+  
 	$(window).resize(function(){resizeCanvas();});
 	setTimeout(resizeCanvas,1);
 	
@@ -133,8 +133,7 @@ function startMenu(){
 	ingame = false;
 	Ticker.setPaused(true);
 	var background = new Shape();
-	background.graphics.beginRadialGradientFill(["#080822","#248"],[0.99,0.01],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
-	background.cache(0,0,gamewidth,gameheight);
+	background.graphics.beginRadialGradientFill(["#248","#080822"],[0.01,0.99],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
 	var startBox = new Shape();
 	startBox.graphics.beginFill('rgba(10,10,10,0.5)').rect(0,15,gamewidth,86).beginFill('rgba(220,180,50,1)').rect(0,-8,gamewidth,86).beginFill('rgba(150,20,20,0.9)').rect(0,0,gamewidth,70);
@@ -161,7 +160,7 @@ function menuScreen(){
 	stage.update();
 	ai1 = ai2 = false;
 	var background = new Shape();
-	background.graphics.beginRadialGradientFill(["#080822","#248"],[0.99,0.01],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
+	background.graphics.beginRadialGradientFill(["#248","#080822"],[0.01,0.99],gamewidth/2,gameheight/2,50,gamewidth/2,gameheight/2,600).rect(0,0,gamewidth,gameheight);
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
 	
@@ -298,7 +297,7 @@ function startLevel(){
 	gui.addChild(scoreBack, scoreText1, scoreText2, reinfText1, reinfText2, energyText1, energyText2,hpText1,hpText2,hText1,hText2,eText1,eText2,dText1,dText2);		
 	stage.addChild(gui);
 	//Box(gamewidth/2-20,80,60,15,stage,"up");
-	
+
 }
 
 function tick(){
