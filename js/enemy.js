@@ -11,6 +11,7 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
+	shape.moveHelper = {"prevX":x,"prevY":y,"moveToX":x,"moveToY":y,"avoid":false};
 	shape.melee = true;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 3;
@@ -24,7 +25,6 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.maxenergy = energy;
 	shape.damage = damage;
 	shape.attack = false;
-	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.snapToPixel = true;
 	shape.vspeed = 0;
@@ -34,13 +34,14 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*120)-60;
 	shape.formy = Math.round(Math.random()*120)-60;
-	shape.counters = [0,0];
+	shape.counters = [0,0,0];
 	shape.update = playerUpdate;
 	shape.ai = aiZUpdate;
 	shape.defaultai = aiZUpdate;
 	shape.death = playerDeath;
 	shape.assumeControl = assumeControl;
 	shape.abandonControl = abandonControl;
+	shape.switchSides = switchSides;
 	shape.halo = new Shape();
 	shape.halo.graphics.setStrokeStyle(1, "round").beginStroke(shape.color).drawCircle(0,0,s);
 	shape.halo.x = shape.x;
@@ -53,9 +54,31 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 }
 
 var aiZUpdate = function(){
+	this.leader = this.side==1?player1:player2;
 	if(this.target)
 		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
+		
+	var moveX,moveY;
 	if(this.target && dis<22500){
+		moveX = this.target.x;
+		moveY = this.target.y;
+	}else{	
+		if(this.moveHelper.avoid && collisionLine(this,this.leader,boxes)){
+			moveX = this.moveHelper.moveToX;
+			moveY = this.moveHelper.moveToY;
+		}else{
+			moveX = this.leader.x+this.formx;
+			moveY = this.leader.y+this.formy;
+		}
+	}
+
+	this.left = this.right = this.up = this.down = false;
+	if(this.y < moveY-this.s)this.down = true;
+	if(this.y > moveY+this.s)this.up = true;
+	if(this.x < moveX-this.s)this.right = true;
+	if(this.x > moveX+this.s)this.left = true;
+
+	/*if(this.target && dis<22500){
 		this.left = this.right = this.up = this.down = false;
 		if(this.y < this.target.y-this.s)this.down = true;
 		if(this.y > this.target.y+this.s)this.up = true;
@@ -63,17 +86,18 @@ var aiZUpdate = function(){
 		if(this.x > this.target.x+this.s)this.left = true;
 	}else{
 		this.left = this.right = this.up = this.down = false;
-		if(this.y < player1.y+this.formy-this.s)this.down = true;
-		if(this.y > player1.y+this.formy+this.s)this.up = true;
-		if(this.x < player1.x+this.formx-this.s)this.right = true;
-		if(this.x > player1.x+this.formx+this.s)this.left = true;
-	}
+		if(this.y < this.leader.y+this.formy-this.s)this.down = true;
+		if(this.y > this.leader.y+this.formy+this.s)this.up = true;
+		if(this.x < this.leader.x+this.formx-this.s)this.right = true;
+		if(this.x > this.leader.x+this.formx+this.s)this.left = true;
+	}*/
 	if((!this.target && this.counters[0]%15 == 0)|| this.counters[0]%60 == 0){
 		this.target = null;
 		for(var t in players){
 			var p = players[t];
 			if(p.side != this.side && !collisionLine(this,p,boxes)){
 				this.target = p;
+				this.counters[2] = 60;
 			}
 		}
 	}
@@ -86,12 +110,45 @@ var aiZUpdate = function(){
 		this.formx = Math.round(Math.random()*120)-60;
 		this.formy = Math.round(Math.random()*120)-60;
 	}
+	
+	if(this.counters[2] == 0){
+		this.moveHelper.prevX = this.x;
+		this.moveHelper.prevY = this.y;
+		if(similarPos(this)){
+			var randPos = getRandomAvoidPos(this);
+			//console.log(randPos);
+			this.moveHelper.moveToX = this.x+randPos[0];
+			this.moveHelper.moveToY = this.y+randPos[1];
+			this.moveHelper.avoid = true;
+		}
+		else{
+			this.moveHelper.avoid = false;
+		}
+	}
+	
 	this.counters[0]--;
 	if(this.counters[0] < 0)this.counters[0] = 60;
 	this.counters[1]--;
-	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+30);
-	
+	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+60);
+	this.counters[2]--;
+	if(this.counters[2] < 0)this.counters[2] = 60;
 
+}
+
+function similarPos(obj){
+	if(Math.abs(obj.x - obj.moveHelper.prevX)<5 && Math.abs(obj.y - obj.moveHelper.prevY)<5)
+		return true;
+	else
+		return false;
+}
+
+function getRandomAvoidPos(obj){
+	var pos=[0,0];
+	/*pos[0] = Math.random()*(100*obj.left+100*obj.right)-100*obj.left;
+	pos[1] = Math.random()*(100*obj.up+100*obj.down)-100*obj.up;*/
+	pos[0] = Math.random()*(200)-100;
+	pos[1] = Math.random()*(200)-100;
+	return pos;
 }
 
 function assumeControl(){

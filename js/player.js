@@ -26,7 +26,6 @@ function Player(name, side, x, y, color, stage,hp,damage,energy){
 	shape.damage = damage;
 	shape.attack = false;
 	shape.angle = 0;
-	shape.snapToPixel = true;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.snapToPixel = true;
 	shape.vspeed = 0;
@@ -36,13 +35,14 @@ function Player(name, side, x, y, color, stage,hp,damage,energy){
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*60);
 	shape.formy = Math.round(Math.random()*60);
-	shape.counters = [0,0];
+	shape.counters = [0,0,0];
 	shape.update = playerUpdate;
 	shape.ai = aiSUpdate;
 	shape.defaultai = aiSUpdate;
 	shape.death = playerDeath;
 	shape.assumeControl = assumeControl;
 	shape.abandonControl = abandonControl;
+	shape.switchSides = switchSides;
 	shape.halo = new Shape();
 	shape.halo.graphics.setStrokeStyle(1, "round").beginStroke(shape.color).drawCircle(0,0,s-1);
 	shape.halo.x = shape.x;
@@ -138,6 +138,7 @@ var playerUpdate = function(j){
 				if(this == player1)console.log(this.acelfactor, "melee attack");
 			}
 			if(this.other && this.other.side != this.side){
+				//this.other.switchSides();
 				this.other.hp -= this.damage;
 			}
 		}
@@ -146,9 +147,30 @@ var playerUpdate = function(j){
 	}
 }
 
+var switchSides = function(){
+	if(this.side == 1){
+		this.side = 2;
+		if(this.controlled){
+			this.abandonControl();
+			setNewPlayer(1);
+		}
+		c2++;
+		c1--;
+	}
+	else if(this.side == 2){
+		this.side = 1;
+		if(this.controlled){
+			this.abandonControl();
+			setNewPlayer(2);
+		}
+		c1++;
+		c2--;
+	}
+}
 
 
 var aiSUpdate = function(){
+	this.leader = this.side==1?player1:player2;
 	if(this.target)
 		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
 	if(this.target && dis<12500){
@@ -159,10 +181,10 @@ var aiSUpdate = function(){
 		if(this.x > this.target.x+this.s)this.right = true;
 	}else{
 		this.left = this.right = this.up = this.down = false;
-		if(this.y < player2.y+this.formy-this.s)this.down = true;
-		if(this.y > player2.y+this.formy+this.s)this.up = true;
-		if(this.x < player2.x+this.formx-this.s)this.right = true;
-		if(this.x > player2.x+this.formx+this.s)this.left = true;
+		if(this.y < this.leader.y+this.formy-this.s)this.down = true;
+		if(this.y > this.leader.y+this.formy+this.s)this.up = true;
+		if(this.x < this.leader.x+this.formx-this.s)this.right = true;
+		if(this.x > this.leader.x+this.formx+this.s)this.left = true;
 	}
 	if((!this.target && this.counters[0]%15 == 0)|| this.counters[0]%60 == 0){
 		this.target = null;
@@ -188,7 +210,9 @@ var aiSUpdate = function(){
 	this.counters[0]--;
 	if(this.counters[0] < 0)this.counters[0] = 60;
 	this.counters[1]--;
-	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+30);
+	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+120);
+	this.counters[2]--;
+	if(this.counters[2] < 0)this.counters[2] = 60;
 }
 
 function setNewPlayer(side){
