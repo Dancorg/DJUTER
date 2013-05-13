@@ -338,9 +338,13 @@ function tick(){
 		if(players[i].side == 1)c1++; else c2++;
 	}*/
 	
-	for(i in boxes){
+	for(var i = boxes.length-1;i >= 0;i--){
+		boxes[i].update(i);
+	}
+	
+	/*for(i in boxes){
 		var box = boxes[i];
-		box.y+=box.speed; //move the box
+		box.y+=box.vspeed; //move the box
 
 		if(box.y>gameheight+box.h){
 			stage.removeChild(box);
@@ -350,7 +354,7 @@ function tick(){
 			stage.removeChild(box);
 			boxes.splice(i,1);//delete the box when out of screen
 		}
-	}
+	}*/
 	
 	for(var i = particles.length-1;i >= 0;i--){
 		var part = particles[i];
@@ -420,7 +424,7 @@ function platformFirstSpawn(){
 		w = Math.round(Math.round(Math.random()*8)*10+10);
 		x = Math.round(Math.round(Math.random()*gamewidth/10)*10-w);
 		y = Math.round(Math.round((Math.random()*(gameheight-80-h))/10)*10+80);
-		Box(x,y,w,h, stage, 0);
+		Box(x,y,w,h, stage, 0,0);
 	}
 }
 

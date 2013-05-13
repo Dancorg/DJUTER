@@ -112,6 +112,7 @@ function Projectile(owner,x,y,damage,hspeed,vspeed,angle,time,drop,color,size1,s
 			var box = boxes[j];
 			if(collisionLinePoints(this.x,this.y,this.x+this.hspeed,this.y+this.vspeed,box,"box")){
 				this.death(i,"explosive");
+				box.hp-=this.damage*10;
 				return true;
 			}
 		}

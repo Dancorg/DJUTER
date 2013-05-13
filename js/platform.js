@@ -1,30 +1,52 @@
-function Box(x, y, w, h, stage, speed){
+function Box(x, y, w, h, stage, hspeed, vspeed){
 	var color;
-	var speed;
 	color = 'rgba(60,80,220,0.75)';
-	speed = speed;	
 	var shape = new Shape();
 	shape.graphics.beginFill(color).rect(0,0,w,h).beginFill(color).rect(3,3,w-6,h-6);
 	shape.color = color;
+	shape.alive = true;
 	shape.x = x;
 	shape.y = y;
 	shape.h = h;
 	shape.w = w;
-	shape.speed = speed;
-	shape.snapToPixel = true;
+	shape.hp = h*w;
+	shape.hspeed = hspeed;
+	shape.vspeed = vspeed;
 	shape.cache(0,0,w,h);
 	shape.snapToPixel = true;
-	stage.addChild(shape);
-	boxes.push(shape);
-	/*boxes.divide = function(){
+	shape.death = function(index){
+		stage.removeChild(this);
+		boxes.splice(index,1);
+		for(var i=0;i<10;i++){
+			Particle(this.x+i,this.y+Math.random()*10,6,Math.random()*20-10,Math.random()*20-10,this.color,stage, false, 40);
+		}
+	}
+	shape.update = function(index){
+		if(!this.alive){
+			this.death(index);
+		}
+		this.x += this.hspeed;
+		this.y += this.vspeed;
+		this.hspeed*=.95;
+		this.vspeed*=.95;
+		if(this.hp<=0)this.divide();
+		//if(Math.abs(hspeed)<=0.1 && Math.abs(vspeed)<=0.1)this.update = function(){return true;}
+	};
+	shape.divide = function(){
 		var divx = this.w/10;
 		var divy = this.h/10;
-		for(var i in divx){
-			for(var j in divy){
-				
+		console.log(divx,divy);
+		if(this.h > 10 || this.w > 10){
+			for(var i=0;i<divx;i++){
+				for(var j=0;j<divy;j++){
+					var newBox = Box(this.x+i*10,this.y+j*10,10,10,stage,Math.random()*(i-(divx-1)/2),Math.random()*(j-(divy-1)/2));
+				}
 			}
 		}
-	};*/
+		this.alive = false;
+	};
+	stage.addChild(shape);
+	boxes.push(shape);
 }
 
 function Base(x,y,r){
@@ -48,24 +70,19 @@ function Base(x,y,r){
 		this.timers[0] --;
 		this.alpha = this.resources/3000;
 		if(this.resources>0 && this.timers[0] == 0){
-			var side1 = side2 = 0;
-			for(i in players){
-				var p = players[i];
-				if(p.side == 1)side1++;
-				else side2++;
-			}
+
 			var dp = [];
 			dp[0] = pointDistanceSquared(this.x, this.y, player1.x, player1.y);
 			dp[1] = pointDistanceSquared(this.x, this.y, player2.x, player2.y);
-			if(dp[0] <= this.s*this.s){
-				var val = 10*Math.round(Math.sqrt(this.s*this.s - dp[0]))/side1;
+			if(c1>0 && dp[0] <= this.s*this.s){
+				var val = 10*Math.round(Math.sqrt(this.s*this.s - dp[0]))/c1;
 				//console.log(val);
 				res1 += val;
 				this.resources -= val;
 			}
 			
-			if(dp[1] <= this.s*this.s){
-				var val = 10*Math.round(Math.sqrt(this.s*this.s - dp[1]))/side2;
+			if(c2>0 && dp[1] <= this.s*this.s){
+				var val = 10*Math.round(Math.sqrt(this.s*this.s - dp[1]))/c2;
 				//console.log(val);
 				res2 += val;
 				this.resources -= val;
