@@ -17,9 +17,11 @@ function Box(x, y, w, h, stage, hspeed, vspeed){
 	shape.death = function(index){
 		stage.removeChild(this);
 		boxes.splice(index,1);
+		updateGrid(this,grid,this.x,this.y,this.w,this.h);
 		for(var i=0;i<10;i++){
 			Particle(this.x+i,this.y+Math.random()*10,6,Math.random()*20-10,Math.random()*20-10,this.color,stage, false, 40);
 		}
+		
 	}
 	shape.update = function(index){
 		if(!this.alive){

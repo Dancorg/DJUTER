@@ -68,8 +68,8 @@ function debuggy(x,y){
 }
 
 function returnPath(start, end){
-	start = grid[Math.floor(start[1]/20)][Math.floor(start[0]/20)];
-	end = grid[Math.floor(end[1]/20)][Math.floor(end[0]/20)];
+	start = grid[Math.floor(start[1]/10)][Math.floor(start[0]/10)];
+	end = grid[Math.floor(end[1]/10)][Math.floor(end[0]/10)];
 	var path = [];
 	var openList = [];
 	var closedList = [];
@@ -87,11 +87,17 @@ function returnPath(start, end){
 			var ret = [];
 			while(curr.parent){
 				ret.push(curr);
-				curr = curr.parent;
+				var par = curr.parent;
+				curr.parent = null;
+				curr = par;
 			}
 			ret.reverse();
 			ResetNode();
-
+			
+			/*for(var i in ret){
+				debuggy(ret[i].pos[1]*10+5,ret[i].pos[0]*10+5);
+			}*/
+			
 			return ret;
 		}
 		var idx = openList.indexOf(currentNode);
@@ -124,7 +130,7 @@ function returnPath(start, end){
 		}
 	}
 	/*for(i in closedList){
-				debuggy(closedList[i].pos[1]*20+10,closedList[i].pos[0]*20+10);
+				debuggy(closedList[i].pos[1]*10+5,closedList[i].pos[0]*10+5);
 			}*/
 	alert("no path");
 	ResetNode();

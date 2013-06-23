@@ -11,7 +11,8 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
-	shape.moveHelper = {"prevX":x,"prevY":y,"moveToX":x,"moveToY":y,"avoid":false};
+	shape.moveHelper = {"prevX":x,"prevY":y,"moveToX":x,"moveToY":y,"next":0};
+	shape.path = null;
 	shape.melee = true;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 3;
@@ -34,7 +35,7 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.target = null;
 	shape.formx = Math.round(Math.random()*120)-60;
 	shape.formy = Math.round(Math.random()*120)-60;
-	shape.counters = [0,0,0];
+	shape.counters = [0,0,0,0];
 	shape.update = playerUpdate;
 	shape.ai = aiZUpdate;
 	shape.defaultai = aiZUpdate;
@@ -48,6 +49,7 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.halo.y = shape.y;
 	shape.halo.regX = -s/2;
 	shape.halo.regY = -s/2;
+	shape._flag = true;
 	stage.addChild(shape.halo);
 	stage.addChild(shape);
 	return shape;
@@ -63,10 +65,33 @@ var aiZUpdate = function(){
 		moveX = this.target.x;
 		moveY = this.target.y;
 	}else{	
-		if(this.moveHelper.avoid && collisionLine(this,this.leader,boxes)){
-			moveX = this.moveHelper.moveToX;
-			moveY = this.moveHelper.moveToY;
+		if( collisionLine(this,this.leader,boxes)){
+			if(!this.path && this._flag /*&& this.counters[2] == 0*/){
+				console.log("path");
+				this.path = returnPath([this.x+this.s/2,this.y+this.s/2],[this.leader.x+this.leader.s/2, this.leader.y+this.leader.s/2]);
+				this.moveHelper.next=0;
+			}else{
+				if(this.counters[2] == 0)this._flag = true;
+			}
+			this._flag = false;
+			if(this.path && this.path.length>0){
+				moveX = this.path[this.moveHelper.next].pos[1]*10;
+				moveY = this.path[this.moveHelper.next].pos[0]*10;
+				if(closePos(this.x,this.y,moveX,moveY)){
+					this.moveHelper.next++;
+					/*console.log("next");*/
+					if(this.moveHelper.next >= this.path.length-1){
+						this.path = null;
+						this._flag = true;
+						console.log("path end");
+					}
+				}
+			}
+			/*moveX = this.moveHelper.moveToX;
+			moveY = this.moveHelper.moveToY;*/
 		}else{
+			this._flag = true;
+			this.path = null;
 			moveX = this.leader.x+this.formx;
 			moveY = this.leader.y+this.formy;
 		}
@@ -111,20 +136,7 @@ var aiZUpdate = function(){
 		this.formy = Math.round(Math.random()*120)-60;
 	}
 	
-	if(this.counters[2] == 0){
-		this.moveHelper.prevX = this.x;
-		this.moveHelper.prevY = this.y;
-		if(similarPos(this)){
-			var randPos = getRandomAvoidPos(this);
-			//console.log(randPos);
-			this.moveHelper.moveToX = this.x+randPos[0];
-			this.moveHelper.moveToY = this.y+randPos[1];
-			this.moveHelper.avoid = true;
-		}
-		else{
-			this.moveHelper.avoid = false;
-		}
-	}
+
 	
 	this.counters[0]--;
 	if(this.counters[0] < 0)this.counters[0] = 60;
@@ -132,7 +144,6 @@ var aiZUpdate = function(){
 	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+60);
 	this.counters[2]--;
 	if(this.counters[2] < 0)this.counters[2] = 60;
-
 }
 
 function similarPos(obj){
@@ -189,7 +200,7 @@ function collisionLine(s,t,p){ // s,t = start and end objects, p = walls
                 return true;
 		}
 	}	
-    for (j in p){ 
+    for (var j in p){ 
 		var i = p[j];
         //var dis2 = pointDistanceSquared(a1[0],a1[1],i.x,i.y);
         var iix = i.x+i.w/2;

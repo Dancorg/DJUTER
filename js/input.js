@@ -130,6 +130,7 @@ function handleMouseMove(e){
 	var mY = e.clientY - canvas.offsetTop;
 	if(player2)
 	player2.angle = Math.atan2(mY-player2.y,mX-player2.x);
+	//if(grid)debugText.text = grid[Math.floor(mY/10)][Math.floor(mX/10)].val;
 }
 
 function handleMouseUp(e){

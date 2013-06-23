@@ -11,6 +11,7 @@ var coins;
 var objectives;
 var quadP;
 var quadB;
+var grid;
 
 var ai1,ai2;
 var c1,c2;
@@ -239,6 +240,9 @@ function startLevel(){
 	
 	
 	platformFirstSpawn();
+	grid = generateGrid();
+	
+	
 	gui = new Container();
 	quadP = Quadtree(0,[0,0,gamewidth,gameheight]);
 	quadB = Quadtree(0,[0,0,gamewidth,gameheight]);
@@ -292,16 +296,23 @@ function startLevel(){
 	dText2.x = gamewidth - 120;
 	dText2.y = 25;
 	
+	debugText = new Text("D: ", "12px impact", "#AFF");
+	debugText.x = 400;
+	debugText.y = 200;; 
+	stage.addChild(debugText);
+	
 	scoreBack = new Shape();
 	scoreBack.graphics.beginFill('rgba(50,180,250,0.35)').drawRoundRectComplex(0,0,250,60,0,0,20,0).drawRoundRectComplex(gamewidth-250,0,250,60,0,0,0,20)//.rect(0,0,150,30);
 	gui.addChild(scoreBack, scoreText1, scoreText2, reinfText1, reinfText2, energyText1, energyText2,hpText1,hpText2,hText1,hText2,eText1,eText2,dText1,dText2);		
 	stage.addChild(gui);
 	//Box(gamewidth/2-20,80,60,15,stage,"up");
+	
 
 }
 
 function tick(){
 	maincounter++;
+	//if(maincounter == 5) console.log(returnPath([50,100],[200,500]));
 	if (endtimer > 0)endtimer--;
 	diff += 0.0002;
 	scoreText1.text = "SCORE1: " + score1;
@@ -428,6 +439,55 @@ function platformFirstSpawn(){
 	}
 }
 
+function generateGrid(){
+	var g = [];
+	var val = 0;
+	for(var i = 0; i<Math.floor(gameheight/10); i++){
+		var row = [];
+		for(var j = 0; j<Math.floor(gamewidth/10); j++){
+			val = 0;
+			//Particle(j*10,i*10,5,0,0,"#44F",stage, false, 50);
+			for(var b in boxes){
+				var box = boxes[b];
+				if(pointCollision(j*10+5,i*10+5,box)){
+					val = 1;
+					//Particle(j*10,i*10,5,0,0,"#F44",stage, false, 50);
+					break;
+				}
+			}
+			row.push(Node(val,[i,j],0,0,0,false));
+		}
+		g.push(row);
+	}
+	//console.log(g);	
+	return g;
+}
+
+function updateGrid(box, g,x,y,w,h){
+	for(var i=Math.floor(y/10); i<Math.floor(y/10+h/10);i++){
+		for(var j=Math.floor(x/10); j<Math.floor(x/10+w/10);j++){
+			//Particle(j*10,i*10,5,0,0,"#F44",stage, false, 50);
+			console.log(j);
+			var val = 0;
+			var bs = quadB.retrieve(box);
+			for(var b in bs){
+				var bx = bs[b];
+				if(bx != box && pointCollision(j*10,i*10,bx)){					
+					val = 1;
+					Particle(j*10,i*10,5,0,0,"#F44",stage, false, 50);
+					break;
+				}
+			}
+			grid[i][j] = Node(val,[i,j],0,0,0,false);
+		}
+	}
+}
+
+
+function pointCollision(x,y,b){
+	if(x>=b.x && x<=b.x+b.w && y>=b.y && y<=b.y+b.h )return true;
+}
+
 function boxCollision(a,b,h,v){
 	var ah = a.hspeed*h;
 	var av = a.vspeed*v;
@@ -439,13 +499,17 @@ function boxCollision(a,b,h,v){
 		px = a.x + i*ah/div;
 		py = a.y + i*av/div;
 		if(ax+i*ah/div < b.x+b.w && ax+a.w+i*ah/div > b.x && ay+i*av/div<b.y+b.h && ay+a.h+i*av/div>b.y ){
+			if(b.w <= 10 && b.h <= 10){
+				b.x+=a.hspeed;
+				b.y+=a.vspeed;
+			}
 			return true;
 		}
 	}
 	return false;
 }
 
-function boxCollision2(a,b,h,v){
+/*function boxCollision2(a,b,h,v){
 	var ah = a.hspeed*h;
 	var av = a.vspeed*v;
 	var ax = a.x-a.hspeed*(1-1*h);
@@ -460,7 +524,7 @@ function boxCollision2(a,b,h,v){
 		}
 	}
 	return false;
-}
+}*/
 
 function playerColllision(playera, b){
 	if(boxCollision(playera, b,1,1)){
@@ -528,6 +592,14 @@ function degToRad(deg){
 function radToDeg(rad){
 	return rad / (Math.PI/180);
 }
+
+
+function closePos(x1,y1,x2,y2){
+	//console.log(Math.abs(x1-x2) , Math.abs(y1-y2));
+	if(Math.abs(x1-x2)<=10 && Math.abs(y1-y2)<=10)return true;
+	else return false;
+}
+
 
 function endRound(){
 	endtimer = 60;

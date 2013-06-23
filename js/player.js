@@ -11,6 +11,7 @@ function Player(name, side, x, y, color, stage,hp,damage,energy){
 	shape.h = s;
 	shape.x = x;
 	shape.y = y;
+	shape.path = null;
 	shape.melee = false;
 	shape.other = null; // stores the other player it is colliding with
 	shape.maxspeed = 2;
@@ -80,7 +81,7 @@ var playerUpdate = function(j){
 		
 		var boxes = [];
 		boxes = quadB.retrieve(this);
-		for(i in boxes ){
+		for(var i in boxes ){
 			b = boxes[i];	
 			preciseColllision(this, b);
 		}
@@ -117,7 +118,7 @@ var playerUpdate = function(j){
 
 		this.other = null;
 		var pass = true;;
-		for(i in players ){
+		for(var i in players ){
 			b = players[i];
 			if(this.side == 1){if(b == player1)pass=false;else pass=true};
 			if(this.side == 2){if(b == player2)pass=false;else pass=true};
@@ -135,7 +136,7 @@ var playerUpdate = function(j){
 				this.energy -= 5;
 				this.acelfactor = 20;
 				this.speedfactor = 3;
-				if(this == player1)console.log(this.acelfactor, "melee attack");
+				//if(this == player1)console.log(this.acelfactor, "melee attack");
 			}
 			if(this.other && this.other.side != this.side){
 				//this.other.switchSides();
@@ -216,7 +217,7 @@ var aiSUpdate = function(){
 }
 
 function setNewPlayer(side){
-	for(i in players){
+	for(var i in players){
 		var p = players[i];
 		if(p.side == side && !p.controlled){
 			p.assumeControl();
