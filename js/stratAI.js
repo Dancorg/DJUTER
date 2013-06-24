@@ -3,9 +3,55 @@ var aistratZUpdate = function(){
 	for(var i in players){
 		if(players[i].side == 1)c1++; else c2++;
 	}*/
+	
+	var moveX,moveY;
+	if(this.target && dis<22500){
+		moveX = this.target.x;
+		moveY = this.target.y;
+	}else{
+		var obj = chooseObj(this);
+		if( collisionLine(this,obj,boxes)){
+			if(!this.path && this._flag /*&& this.counters[2] == 0*/){
+				console.log("path");
+				this.path = returnPath([this.x+this.s/2,this.y+this.s/2],[obj.x, obj.y]);
+				this.moveHelper.next=0;
+			}else{
+				if(this.counters[2] == 0)this._flag = true;
+			}
+			this._flag = false;
+			if(this.path && this.path.length>0){
+				moveX = this.path[this.moveHelper.next].pos[1]*10;
+				moveY = this.path[this.moveHelper.next].pos[0]*10;
+				if(closePos(this.x,this.y,moveX,moveY)){
+					this.moveHelper.next++;
+					/*console.log("next");*/
+					if(this.moveHelper.next >= this.path.length-1){
+						this.path = null;
+						this._flag = true;
+						console.log("path end");
+					}
+				}
+			}
+			/*moveX = this.moveHelper.moveToX;
+			moveY = this.moveHelper.moveToY;*/
+		}else{
+			this._flag = true;
+			this.path = null;
+			moveX = obj.x;
+			moveY = obj.y;
+		}
+	}
+	
 	if(this.target)
 		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
-	if(this.target && dis<22500){
+		
+	this.left = this.right = this.up = this.down = false;
+	if(this.y < moveY-this.s)this.down = true;
+	if(this.y > moveY+this.s)this.up = true;
+	if(this.x < moveX-this.s)this.right = true;
+	if(this.x > moveX+this.s)this.left = true;	
+		
+	/*if(this.target && dis<22500){
 		this.left = this.right = this.up = this.down = false;
 		if(this.y < this.target.y-this.s)this.down = true;
 		if(this.y > this.target.y+this.s)this.up = true;
@@ -18,7 +64,7 @@ var aistratZUpdate = function(){
 		if(this.y > obj.y+this.s)this.up = true;
 		if(this.x < obj.x-this.s)this.right = true;
 		if(this.x > obj.x+this.s)this.left = true;
-	}
+	}*/
 	if((!this.target && this.counters[0]%15 == 0)|| this.counters[0]%60 == 0){
 		this.target = null;
 		for(var t in players){
@@ -63,11 +109,11 @@ var aistratZUpdate = function(){
 			obj.y = objectives[2].y;
 			//console.log("upgrade");
 		}
-		else{
+		/*else{
 			obj.x = Math.random()*gamewidth;
 			obj.y = Math.random()*gameheight;
 			//console.log("random");
-		}
+		}*/
 		return obj;
 	}
 }

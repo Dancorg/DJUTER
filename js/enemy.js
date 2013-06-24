@@ -1,11 +1,11 @@
-function Enemy(x, y, stage, side,hp,damage,energy){
+function Enemy(x, y, color, stage, side,hp,damage,energy){
 	var shape = new Shape();
 	var s = 10;	
 	shape.controlled = false;
 	shape.side = side;
 	shape.isAlive = true;
-	shape.color = 'rgba(220,50,80,1)';
-	shape.graphics.beginFill('rgba(220,50,80,1)').rect(0,0,s,s).beginFill('rgba(220,50,80,0.1)').rect(-3,-3,s+6,s+6);
+	shape.color = 'rgba('+color+',1)';//'rgba(220,50,80,1)';
+	shape.graphics.beginFill(shape.color).rect(0,0,s,s).beginFill('rgba('+color+',0.1)').rect(-3,-3,s+6,s+6);
 	shape.s = s;
 	shape.w = s;
 	shape.h = s;
@@ -13,9 +13,7 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.y = y;
 	shape.moveHelper = {"prevX":x,"prevY":y,"moveToX":x,"moveToY":y,"next":0};
 	shape.path = null;
-	shape.melee = true;
-	shape.other = null; // stores the other player it is colliding with
-	shape.maxspeed = 3;
+	shape.other = null; // stores the other player it is colliding with	
 	shape.hp = hp;
 	shape.maxhp = hp;
 	shape.left = 0;
@@ -23,9 +21,11 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.up = 0;
 	shape.down = 0;
 	shape.energy = 0;
+	shape.firerate = 5;
 	shape.maxenergy = energy;
 	shape.damage = damage;
 	shape.attack = false;
+	shape.angle = 0;
 	shape.cache(-3,-3,s+6,s+6);
 	shape.snapToPixel = true;
 	shape.vspeed = 0;
@@ -33,12 +33,24 @@ function Enemy(x, y, stage, side,hp,damage,energy){
 	shape.speedfactor = 1;
 	shape.acelfactor = 1;
 	shape.target = null;
-	shape.formx = Math.round(Math.random()*120)-60;
-	shape.formy = Math.round(Math.random()*120)-60;
+	if(side == 1){
+		shape.maxspeed = 3;
+		shape.melee = true;
+		shape.formx = Math.round(Math.random()*120)-60;
+		shape.formy = Math.round(Math.random()*120)-60;		
+		shape.ai = aiZUpdate;
+		shape.defaultai = aiZUpdate;
+	}
+	if(side == 2){
+		shape.maxspeed = 2;
+		shape.melee = false;
+		shape.formx = Math.round(Math.random()*60);
+		shape.formy = Math.round(Math.random()*60);		
+		shape.ai = aiZUpdate;
+		shape.defaultai = aiZUpdate;
+	}
 	shape.counters = [0,0,0,0];
 	shape.update = playerUpdate;
-	shape.ai = aiZUpdate;
-	shape.defaultai = aiZUpdate;
 	shape.death = playerDeath;
 	shape.assumeControl = assumeControl;
 	shape.abandonControl = abandonControl;
@@ -96,47 +108,58 @@ var aiZUpdate = function(){
 			moveY = this.leader.y+this.formy;
 		}
 	}
-
-	this.left = this.right = this.up = this.down = false;
-	if(this.y < moveY-this.s)this.down = true;
-	if(this.y > moveY+this.s)this.up = true;
-	if(this.x < moveX-this.s)this.right = true;
-	if(this.x > moveX+this.s)this.left = true;
-
-	/*if(this.target && dis<22500){
+	
+	if(this.side == 1){
 		this.left = this.right = this.up = this.down = false;
-		if(this.y < this.target.y-this.s)this.down = true;
-		if(this.y > this.target.y+this.s)this.up = true;
-		if(this.x < this.target.x-this.s)this.right = true;
-		if(this.x > this.target.x+this.s)this.left = true;
+		if(this.y < moveY-this.s)this.down = true;
+		if(this.y > moveY+this.s)this.up = true;
+		if(this.x < moveX-this.s)this.right = true;
+		if(this.x > moveX+this.s)this.left = true;
 	}else{
-		this.left = this.right = this.up = this.down = false;
-		if(this.y < this.leader.y+this.formy-this.s)this.down = true;
-		if(this.y > this.leader.y+this.formy+this.s)this.up = true;
-		if(this.x < this.leader.x+this.formx-this.s)this.right = true;
-		if(this.x > this.leader.x+this.formx+this.s)this.left = true;
-	}*/
+		if(this.target && dis<12500){
+			this.left = this.right = this.up = this.down = false;
+			if(this.y < this.target.y-this.s)this.up = true;
+			if(this.y > this.target.y+this.s)this.down = true;
+			if(this.x < this.target.x-this.s)this.left = true;
+			if(this.x > this.target.x+this.s)this.right = true;
+		}else{
+			this.left = this.right = this.up = this.down = false;
+			if(this.y < moveY-this.s)this.down = true;
+			if(this.y > moveY+this.s)this.up = true;
+			if(this.x < moveX-this.s)this.right = true;
+			if(this.x > moveX+this.s)this.left = true;
+		}
+	}
+	
 	if((!this.target && this.counters[0]%15 == 0)|| this.counters[0]%60 == 0){
 		this.target = null;
 		for(var t in players){
 			var p = players[t];
 			if(p.side != this.side && !collisionLine(this,p,boxes)){
 				this.target = p;
-				this.counters[2] = 60;
+				//this.counters[2] = 60;
 			}
 		}
 	}
-	if(this.target && dis<20000){
-		this.attack = true;
+	if(this.side == 1){
+		if(this.target && dis<20000){
+			this.attack = true;
+		}
+		else this.attack = false;
+	}else{
+		if(this.target && !collisionLine(this,this.target,boxes) && dis<30000){
+			this.angle = Math.atan2(this.target.y-this.y,this.target.x-this.x);
+			this.attack = true;
+		}
+		else{
+			this.attack = false;
+		}
 	}
-	else this.attack = false;
 	
 	if(this.counters[1] == 0){
 		this.formx = Math.round(Math.random()*120)-60;
 		this.formy = Math.round(Math.random()*120)-60;
 	}
-	
-
 	
 	this.counters[0]--;
 	if(this.counters[0] < 0)this.counters[0] = 60;

@@ -223,16 +223,17 @@ function startLevel(){
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
 	objectives = [Base(Math.random()*gamewidth/2, Math.random()*gameheight, 30),Base(Math.random()*gamewidth/2+gamewidth/2, Math.random()*gameheight, 30),Objective(gamewidth/4+Math.random()*gamewidth/2, Math.random()*gameheight, 70)];
-	ene = Enemy(100,gameheight/2,stage, 1,stats1.hp,stats1.damage,stats1.energy);
-	ene1 = Enemy(ene.x+50,ene.y,stage, 1,stats1.hp,stats1.damage,stats1.energy);
-	ene2 = Enemy(ene.x-50,ene.y,stage, 1,stats1.hp,stats1.damage,stats1.energy);
-	ene3 = Enemy(ene.x,ene.y+50,stage, 1,stats1.hp,stats1.damage,stats1.energy);
-	ene4 = Enemy(ene.x,ene.y-50,stage, 1,stats1.hp,stats1.damage,stats1.energy);
-	pl = new Player("Player 2",2, gamewidth-100, gameheight/2,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
-	pl2 = new Player("Player 2",2, pl.x+50, pl.y,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
-	pl3 = new Player("Player 2",2, pl.x-50, pl.y,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
-	pl4 = new Player("Player 2",2, pl.x, pl.y+50,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
-	pl5 = new Player("Player 2",2, pl.x, pl.y-50,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
+	ene = Enemy(100,gameheight/2, "220,50,80",stage,1,stats1.hp,stats1.damage,stats1.energy);
+	ene1 = Enemy(ene.x+50,ene.y, "220,50,80",stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene2 = Enemy(ene.x-50,ene.y, "220,50,80",stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene3 = Enemy(ene.x,ene.y+50, "220,50,80",stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	ene4 = Enemy(ene.x,ene.y-50, "220,50,80",stage, 1,stats1.hp,stats1.damage,stats1.energy);
+	pl = Enemy(gamewidth-100, gameheight/2,"250,180,40", stage, 2,stats2.hp,stats2.damage,stats2.energy);
+	//pl2 = new Player("Player 2",2, pl.x+50, pl.y,"250,180,40", stage,stats2.hp,stats2.damage,stats2.energy);
+	pl2 = Enemy(pl.x+50, pl.y,"250,180,40", stage, 2,stats2.hp,stats2.damage,stats2.energy);
+	pl3 = Enemy(pl.x-50, pl.y,"250,180,40", stage, 2,stats2.hp,stats2.damage,stats2.energy);
+	pl4 = Enemy(pl.x, pl.y+50,"250,180,40", stage, 2,stats2.hp,stats2.damage,stats2.energy);
+	pl5 = Enemy(pl.x, pl.y-50,"250,180,40", stage, 2,stats2.hp,stats2.damage,stats2.energy);
 	ene.assumeControl();
 	pl.assumeControl();
 	c1 = c2 = 5;
@@ -397,13 +398,13 @@ function tick(){
 	if(res1 >= 500){
 		res1-=500;
 		c1++;
-		players.push(Enemy(0,gameheight/2,stage, 1, stats1.hp,stats1.damage,stats1.energy));
+		players.push(Enemy(11,gameheight/2, "220,50,80",stage, 1, stats1.hp,stats1.damage,stats1.energy));
 		//players.push(Player("Player 1",1, 0, gameheight/2,"220,50,80", stage, stats1.hp,stats1.damage,stats1.energy));
 	}
 	if(res2 >= 500){
 		res2-=500;
 		c2++;
-		players.push(Player("Player 2",2, gamewidth, gameheight/2,"250,180,40", stage, stats2.hp,stats2.damage,stats2.energy));
+		players.push(Enemy(gamewidth-11, gameheight/2,"250,180,40", stage, 2,stats2.hp,stats2.damage,stats2.energy));
 		//players.push(Enemy(gamewidth,gameheight/2,stage, 2, stats2.hp,stats2.damage,stats2.energy));
 	}
 	for(i in objectives){
@@ -486,6 +487,18 @@ function updateGrid(box, g,x,y,w,h){
 
 function pointCollision(x,y,b){
 	if(x>=b.x && x<=b.x+b.w && y>=b.y && y<=b.y+b.h )return true;
+}
+
+function checkForBox(x,y){
+	var point = {"x":x,"y":y,"w":1,"h":1};
+	var bs = quadB.retrieve(point);
+	for(var b in bs){
+		var bx = bs[b];
+		if(pointCollision(x,y,bx)){					
+			return true;
+		}
+	}
+	return false;
 }
 
 function boxCollision(a,b,h,v){

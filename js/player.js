@@ -1,4 +1,4 @@
-function Player(name, side, x, y, color, stage,hp,damage,energy){
+/*function Player(name, side, x, y, color, stage,hp,damage,energy){
 	var shape = new Shape();
 	var s = 10;
 	shape.controlled = false;
@@ -53,7 +53,7 @@ function Player(name, side, x, y, color, stage,hp,damage,energy){
 	stage.addChild(shape.halo);
 	stage.addChild(shape);
 	return shape;
-}
+}*/
 
 var playerDeath = function(j){
 	this.isAlive = false;
@@ -169,8 +169,7 @@ var switchSides = function(){
 	}
 }
 
-
-var aiSUpdate = function(){
+/*var aiSUpdate = function(){
 	this.leader = this.side==1?player1:player2;
 	if(this.target)
 		var dis = pointDistanceSquared(this.x,this.y,this.target.x,this.target.y);
@@ -214,7 +213,7 @@ var aiSUpdate = function(){
 	if(this.counters[1] < 0)this.counters[1] = Math.round(Math.random()*120+120);
 	this.counters[2]--;
 	if(this.counters[2] < 0)this.counters[2] = 60;
-}
+}*/
 
 function setNewPlayer(side){
 	for(var i in players){

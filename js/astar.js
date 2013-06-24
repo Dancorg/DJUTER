@@ -68,6 +68,8 @@ function debuggy(x,y){
 }
 
 function returnPath(start, end){
+	if(checkForBox(start[0], start[1]) || checkForBox(end[0], end[1])) return [];
+	
 	start = grid[Math.floor(start[1]/10)][Math.floor(start[0]/10)];
 	end = grid[Math.floor(end[1]/10)][Math.floor(end[0]/10)];
 	var path = [];
