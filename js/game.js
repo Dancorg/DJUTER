@@ -473,7 +473,7 @@ function updateGrid(box, g,x,y,w,h){
 			var bs = quadB.retrieve(box);
 			for(var b in bs){
 				var bx = bs[b];
-				if(bx != box && pointCollision(j*10,i*10,bx)){					
+				if(bx != box && box.w > 10 && box.h > 10 && pointCollision(j*10,i*10,bx)){					
 					val = 1;
 					Particle(j*10,i*10,5,0,0,"#F44",stage, false, 50);
 					break;
