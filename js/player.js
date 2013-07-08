@@ -94,7 +94,7 @@ var playerUpdate = function(j){
 		if(this.y+this.s>gameheight)this.y = gameheight-this.s;
 			
 		if(this.halo){
-			//this.halo.graphics.clear().setStrokeStyle(2, "round").beginStroke(shape.color).drawCircle(0,0,50);
+			//this.halo.graphics.clear().setStrokeStyle(2, "round").beginStroke(this.halo.color).drawCircle(0,0,50);
 			this.halo.alpha = this.hp/this.maxhp;
 			this.halo.x = this.x;
 			this.halo.y = this.y;
@@ -140,7 +140,7 @@ var playerUpdate = function(j){
 			}
 			if(this.other && this.other.side != this.side){
 				//this.other.switchSides();
-				this.other.hp -= this.damage;
+				this.other.hp -= this.damage + Math.sqrt(this.hspeed*this.hspeed + this.vspeed*this.vspeed);
 			}
 		}
 		//else if(this.energy<=10)this.attack = false;
