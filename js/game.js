@@ -165,7 +165,7 @@ function menuScreen(){
 	background.cache(0,0,gamewidth,gameheight);
 	stage.addChild(background);
 	
-	var side1ai = new Text("PLAYER 1: HUMAN", "17px impact", "#AFF");
+	var side1ai = new Text("ZOMBIES: HUMAN", "17px impact", "#AFF");
 	side1ai.x = 10;
 	side1ai.y = 60;
 	
@@ -174,16 +174,16 @@ function menuScreen(){
 	button1.addEventListener("click",function(e){
 		if(ai1 == false){
 			ai1=true;
-			side1ai.text = "PLAYER 1: AI";
+			side1ai.text = "ZOMBIES: AI";
 		}
 		else {
 			ai1 = false;
-			side1ai.text = "PLAYER 1: HUMAN";
+			side1ai.text = "ZOMBIES: HUMAN";
 		}
 		stage.update();
 	});
 	
-	var side2ai = new Text("PLAYER 2: HUMAN", "17px impact", "#AFF");
+	var side2ai = new Text("SOLDIERS: HUMAN", "17px impact", "#AFF");
 	side2ai.x = 10;
 	side2ai.y = 160;
 	
@@ -192,11 +192,11 @@ function menuScreen(){
 	button2.addEventListener("click",function(e){
 		if(ai2 == false){
 			ai2=true;
-			side2ai.text = "PLAYER 2: AI";
+			side2ai.text = "SOLDIERS: AI";
 		}
 		else {
 			ai2 = false;
-			side2ai.text = "PLAYER 2: HUMAN";
+			side2ai.text = "SOLDIERS: HUMAN";
 		}
 		stage.update();
 	});
@@ -617,8 +617,8 @@ function closePos(x1,y1,x2,y2){
 function endRound(){
 	endtimer = 60;
 	var deathText = new Text("", "30px Impact", "#FFF");
-	if(c1 == 0)deathText.text="PLAYER 2 WINS";
-	if(c2 == 0)deathText.text="PLAYER 1 WINS";
+	if(c1 == 0)deathText.text="SOLDIERS WIN";
+	if(c2 == 0)deathText.text="ZOMBIES WIN";
 	if(c1 == 0 && c2==0)deathText.text="DRAW";	
 	deathText.textAlign = "center";
 	deathText.x = gamewidth/2;
